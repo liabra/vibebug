@@ -1,20 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
 import LevelCard from '../components/LevelCard'
-
-function getSaved(levelId) {
-  try { return JSON.parse(localStorage.getItem(`vibebug_${levelId}`)) ?? null } catch { return null }
-}
+import { getSaved, getLevelStatus } from '../utils/progressUtils'
 
 export default function LevelsPage() {
   const navigate = useNavigate()
   const levelEntries = Object.entries(bashChallenges)
-
-  function isLocked(index) {
-    if (index === 0) return false
-    const prevId = levelEntries[index - 1][0]
-    return !getSaved(prevId)?.completed
-  }
 
   function handleStart(levelId, locked) {
     if (locked) return
@@ -30,7 +21,7 @@ export default function LevelsPage() {
       <h1 style={styles.heading}>Choisissez un niveau</h1>
       <div style={styles.grid}>
         {levelEntries.map(([id, level], index) => {
-          const locked = isLocked(index)
+          const locked = getLevelStatus(id, index, levelEntries) === 'locked'
           return (
             <LevelCard
               key={id}

@@ -1,37 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
-
-// --- helpers -----------------------------------------------------------------
-
-function getSaved(levelId) {
-  try { return JSON.parse(localStorage.getItem(`vibebug_${levelId}`)) ?? null } catch { return null }
-}
-
-function getStatus(saved, index, allEntries) {
-  if (index > 0) {
-    const prevId = allEntries[index - 1][0]
-    const prevSaved = getSaved(prevId)
-    if (!prevSaved?.completed) return 'locked'
-  }
-  if (!saved) return 'new'
-  if (saved.completed) return 'done'
-  return 'inProgress'
-}
-
-function getBadge(saved) {
-  if (!saved?.completed || saved.score == null || !saved.total) return null
-  const pct = Math.round((saved.score / saved.total) * 100)
-  if (pct === 100) return { icon: '🏆', label: 'Expert Bash',  color: '#854d0e', bg: '#fefce8', border: '#ca8a04' }
-  if (pct >= 60)  return { icon: '👍', label: 'Bon niveau',   color: '#166534', bg: '#f0fdf4', border: '#16a34a' }
-  return              { icon: '💪', label: 'À améliorer',  color: '#991b1b', bg: '#fef2f2', border: '#dc2626' }
-}
-
-const STATUS_META = {
-  locked:    { label: 'Verrouillé', color: '#9ca3af', bg: '#f3f4f6', border: '#d1d5db' },
-  new:       { label: 'Nouveau',    color: '#6b7280', bg: '#f9fafb', border: '#e5e7eb' },
-  inProgress:{ label: 'En cours',  color: '#d97706', bg: '#fffbeb', border: '#fcd34d' },
-  done:      { label: 'Terminé',   color: '#16a34a', bg: '#f0fdf4', border: '#86efac' },
-}
+import { getSaved, getLevelStatus, getBadge, getTotalXp, getCompletedCount } from '../utils/progressUtils'
 
 // --- component ---------------------------------------------------------------
 
@@ -42,7 +11,7 @@ export default function ProfilePage() {
 
   const levels = levelEntries.map(([id, level], index) => {
     const saved = getSaved(id)
-    const status = getStatus(saved, index, levelEntries)
+    const status = getLevelStatus(id, index, levelEntries)
     const badge = getBadge(saved)
     const pct = saved?.completed && saved.total
       ? Math.round((saved.score / saved.total) * 100)
@@ -50,8 +19,8 @@ export default function ProfilePage() {
     return { id, title: level.title, total: level.challenges.length, saved, status, badge, pct }
   })
 
-  const totalXp        = levels.reduce((sum, l) => sum + (l.saved?.xp ?? 0), 0)
-  const completedCount = levels.filter(l => l.status === 'done').length
+  const totalXp        = getTotalXp(levelEntries)
+  const completedCount = getCompletedCount(levelEntries)
   const globalPct      = Math.round((completedCount / total) * 100)
   const badges         = levels.map(l => l.badge).filter(Boolean)
 
