@@ -2,18 +2,27 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
 
+function loadProgress(key) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? {} } catch { return {} }
+}
+
 export default function ChallengePage() {
   const { levelId } = useParams()
   const navigate = useNavigate()
 
   const level = bashChallenges[levelId]
   const challenges = level?.challenges ?? []
+  const STORAGE_KEY = `vibebug_${levelId}`
 
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(() => loadProgress(STORAGE_KEY).currentIndex ?? 0)
   const [selectedAnswer, setSelectedAnswer] = useState(null)
-  const [score, setScore] = useState(0)
-  const [xp, setXp] = useState(0)
+  const [score, setScore] = useState(() => loadProgress(STORAGE_KEY).score ?? 0)
+  const [xp, setXp] = useState(() => loadProgress(STORAGE_KEY).xp ?? 0)
   const [xpFlash, setXpFlash] = useState(false)
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ currentIndex, score, xp }))
+  }, [currentIndex, score, xp])
 
   useEffect(() => {
     if (!xpFlash) return
@@ -50,6 +59,7 @@ export default function ChallengePage() {
 
   function handleNext() {
     if (isLast) {
+      localStorage.removeItem(STORAGE_KEY)
       navigate('/results', {
         state: {
           score,
@@ -64,6 +74,14 @@ export default function ChallengePage() {
     setSelectedAnswer(null)
   }
 
+  function handleRestart() {
+    localStorage.removeItem(STORAGE_KEY)
+    setCurrentIndex(0)
+    setScore(0)
+    setXp(0)
+    setSelectedAnswer(null)
+  }
+
   function getOptionStyle(index) {
     if (!isAnswered) return styles.option
     if (index === challenge.correctAnswer) return { ...styles.option, ...styles.optionCorrect }
@@ -74,7 +92,14 @@ export default function ChallengePage() {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <span style={styles.level}>{level.title}</span>
+        <span style={styles.level}>
+          {level.title}
+          {(currentIndex > 0 || score > 0) && (
+            <button onClick={handleRestart} style={styles.btnRestart} title="Recommencer">
+              ↺
+            </button>
+          )}
+        </span>
         <span
           style={{
             ...styles.xpBadge,
@@ -170,6 +195,18 @@ const styles = {
     color: '#6b7280',
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.4rem',
+  },
+  btnRestart: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '1rem',
+    color: '#9ca3af',
+    padding: '0',
+    lineHeight: 1,
   },
   xpBadge: {
     fontSize: '0.95rem',
