@@ -19,6 +19,7 @@ export default function ChallengePage() {
   const [score, setScore] = useState(() => loadProgress(STORAGE_KEY).score ?? 0)
   const [xp, setXp] = useState(() => loadProgress(STORAGE_KEY).xp ?? 0)
   const [xpFlash, setXpFlash] = useState(false)
+  const [confirmTarget, setConfirmTarget] = useState(null)
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ currentIndex, score, xp }))
@@ -74,6 +75,18 @@ export default function ChallengePage() {
     setSelectedAnswer(null)
   }
 
+  function handleExitRequest(target) {
+    setConfirmTarget(target)
+  }
+
+  function handleExitConfirm() {
+    navigate(confirmTarget) // localStorage intact — progression conservée
+  }
+
+  function handleExitCancel() {
+    setConfirmTarget(null)
+  }
+
   function handleRestart() {
     localStorage.removeItem(STORAGE_KEY)
     setCurrentIndex(0)
@@ -91,6 +104,25 @@ export default function ChallengePage() {
 
   return (
     <div style={styles.container}>
+      <div style={styles.nav}>
+        <button onClick={() => handleExitRequest('/levels')} style={styles.btnNav}>
+          ← Niveaux
+        </button>
+        <button onClick={() => handleExitRequest('/')} style={styles.btnNav}>
+          🏠 Accueil
+        </button>
+      </div>
+
+      {confirmTarget && (
+        <div style={styles.confirmBanner}>
+          <p style={styles.confirmText}>Ta progression est sauvegardée. Quitter le niveau ?</p>
+          <div style={styles.confirmActions}>
+            <button onClick={handleExitConfirm} style={styles.btnConfirmYes}>Oui, quitter</button>
+            <button onClick={handleExitCancel} style={styles.btnConfirmCancel}>Annuler</button>
+          </div>
+        </div>
+      )}
+
       <div style={styles.header}>
         <span style={styles.level}>
           {level.title}
@@ -170,6 +202,61 @@ const styles = {
     margin: '0 auto',
     padding: '2rem 1rem',
     fontFamily: 'system-ui, sans-serif',
+  },
+  nav: {
+    display: 'flex',
+    gap: '0.5rem',
+    marginBottom: '1.25rem',
+  },
+  btnNav: {
+    background: 'none',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    padding: '0.4rem 0.875rem',
+    fontSize: '0.875rem',
+    color: '#374151',
+    cursor: 'pointer',
+    fontWeight: '500',
+  },
+  confirmBanner: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+    padding: '1rem 1.25rem',
+    background: '#fffbeb',
+    border: '1px solid #fcd34d',
+    borderRadius: '10px',
+    marginBottom: '1.25rem',
+  },
+  confirmText: {
+    margin: 0,
+    fontSize: '0.95rem',
+    color: '#92400e',
+    fontWeight: '500',
+  },
+  confirmActions: {
+    display: 'flex',
+    gap: '0.625rem',
+  },
+  btnConfirmYes: {
+    padding: '0.45rem 1rem',
+    background: '#dc2626',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '7px',
+    fontSize: '0.875rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+  },
+  btnConfirmCancel: {
+    padding: '0.45rem 1rem',
+    background: '#fff',
+    color: '#374151',
+    border: '1px solid #d1d5db',
+    borderRadius: '7px',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    cursor: 'pointer',
   },
   header: {
     display: 'flex',
