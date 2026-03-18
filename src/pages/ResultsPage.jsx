@@ -5,17 +5,18 @@ export default function ResultsPage() {
   const navigate = useNavigate()
 
   const score = state?.score ?? 0
+  const xp = state?.xp ?? 0
   const total = state?.total ?? 0
   const levelTitle = state?.levelTitle ?? ''
   const percentage = total > 0 ? Math.round((score / total) * 100) : 0
 
-  function getMessage() {
-    if (percentage === 100) return 'Parfait ! Score maximal 🏆'
-    if (percentage >= 80) return 'Excellent travail !'
-    if (percentage >= 60) return 'Bien joué !'
-    if (percentage >= 40) return 'Pas mal, continuez à pratiquer.'
-    return 'Réessayez pour progresser.'
+  function getBadge() {
+    if (percentage === 100) return { label: 'Expert Bash', icon: '🏆', bg: '#fefce8', border: '#ca8a04', color: '#854d0e' }
+    if (percentage >= 60)  return { label: 'Bon niveau',  icon: '👍', bg: '#f0fdf4', border: '#16a34a', color: '#166534' }
+    return                        { label: 'À améliorer', icon: '💪', bg: '#fef2f2', border: '#dc2626', color: '#991b1b' }
   }
+
+  const badge = getBadge()
 
   return (
     <div style={styles.container}>
@@ -28,7 +29,12 @@ export default function ResultsPage() {
       </div>
 
       <p style={styles.percentage}>{percentage} %</p>
-      <p style={styles.message}>{getMessage()}</p>
+      <p style={styles.xp}>⚡ {xp} XP gagnés</p>
+
+      <div style={{ ...styles.badge, background: badge.bg, borderColor: badge.border, color: badge.color }}>
+        <span style={styles.badgeIcon}>{badge.icon}</span>
+        <span style={styles.badgeLabel}>{badge.label}</span>
+      </div>
 
       <div style={styles.actions}>
         <button onClick={() => navigate('/levels')} style={styles.btnSecondary}>
@@ -85,11 +91,28 @@ const styles = {
     color: '#6b7280',
     marginBottom: '0.75rem',
   },
-  message: {
+  xp: {
     fontSize: '1.1rem',
-    color: '#374151',
+    fontWeight: '700',
+    color: '#2563eb',
+    marginBottom: '0.5rem',
+  },
+  badge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    padding: '0.625rem 1.25rem',
+    border: '2px solid',
+    borderRadius: '999px',
     marginBottom: '2.5rem',
-    fontWeight: '500',
+    fontWeight: '700',
+  },
+  badgeIcon: {
+    fontSize: '1.4rem',
+    lineHeight: 1,
+  },
+  badgeLabel: {
+    fontSize: '1rem',
   },
   actions: {
     display: 'flex',

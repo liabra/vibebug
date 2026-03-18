@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
 
@@ -12,6 +12,14 @@ export default function ChallengePage() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [score, setScore] = useState(0)
+  const [xp, setXp] = useState(0)
+  const [xpFlash, setXpFlash] = useState(false)
+
+  useEffect(() => {
+    if (!xpFlash) return
+    const t = setTimeout(() => setXpFlash(false), 400)
+    return () => clearTimeout(t)
+  }, [xpFlash])
 
   if (!level) {
     return (
@@ -33,7 +41,11 @@ export default function ChallengePage() {
     if (isAnswered) return
     const correct = index === challenge.correctAnswer
     setSelectedAnswer(index)
-    if (correct) setScore((s) => s + 1)
+    if (correct) {
+      setScore((s) => s + 1)
+      setXp((x) => x + 10)
+      setXpFlash(true)
+    }
   }
 
   function handleNext() {
@@ -41,6 +53,7 @@ export default function ChallengePage() {
       navigate('/results', {
         state: {
           score,
+          xp,
           total: challenges.length,
           levelTitle: level.title,
         },
@@ -62,9 +75,27 @@ export default function ChallengePage() {
     <div style={styles.container}>
       <div style={styles.header}>
         <span style={styles.level}>{level.title}</span>
+        <span
+          style={{
+            ...styles.xpBadge,
+            transform: xpFlash ? 'scale(1.25)' : 'scale(1)',
+            color: xpFlash ? '#16a34a' : '#2563eb',
+          }}
+        >
+          ⚡ {xp} XP
+        </span>
         <span style={styles.progress}>
           {currentIndex + 1} / {challenges.length}
         </span>
+      </div>
+
+      <div style={styles.progressBar}>
+        <div
+          style={{
+            ...styles.progressFill,
+            width: `${((currentIndex + 1) / challenges.length) * 100}%`,
+          }}
+        />
       </div>
 
       <h2 style={styles.title}>{challenge.title}</h2>
@@ -119,13 +150,33 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '1.5rem',
+    marginBottom: '0.75rem',
+  },
+  progressBar: {
+    height: '6px',
+    background: '#e5e7eb',
+    borderRadius: '999px',
+    overflow: 'hidden',
+    marginBottom: '1.75rem',
+  },
+  progressFill: {
+    height: '100%',
+    background: '#2563eb',
+    borderRadius: '999px',
+    transition: 'width 0.3s ease',
   },
   level: {
     fontSize: '0.875rem',
     color: '#6b7280',
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
+  },
+  xpBadge: {
+    fontSize: '0.95rem',
+    fontWeight: '700',
+    color: '#2563eb',
+    transition: 'transform 0.2s ease, color 0.2s ease',
+    display: 'inline-block',
   },
   progress: {
     fontSize: '0.875rem',
