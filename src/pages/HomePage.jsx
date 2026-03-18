@@ -18,26 +18,31 @@ const WHY_ITEMS = [
   },
 ]
 
-const MODULES = [
+const PARCOURS = [
   {
+    level: 'Découverte',
     icon: '🐧',
     title: 'Linux / Bash',
-    desc: 'Commandes, permissions, scripts, pipes — les fondations du développeur.',
+    desc: 'Commandes, permissions, scripts, pipes — les fondations incontournables du développeur moderne.',
     status: 'active',
   },
   {
+    level: 'Pratique',
     icon: '⚙️',
     title: 'Automatisation',
-    desc: 'Cron, CI/CD, scripts Python — automatise sans casser.',
+    desc: 'Cron, CI/CD, scripts Python — apprends à automatiser sans introduire de bugs silencieux.',
     status: 'soon',
   },
   {
+    level: 'Avancé',
     icon: '☁️',
     title: 'Cloud / Déploiement',
-    desc: 'Docker, Nginx, VPS — déploie en comprenant ce que tu fais.',
-    status: 'soon',
+    desc: 'Docker, Nginx, VPS — déploie en comprenant ce que tu fais, pas en espérant que ça marche.',
+    status: 'later',
   },
 ]
+
+const UPCOMING = ['Git avancé', 'Sécurité web', 'API & REST', 'Bases de données', 'Tests & CI']
 
 const STEPS = [
   { number: '01', title: 'Choisis un niveau', desc: 'Débutant, intermédiaire ou avancé — commence là où tu en es.' },
@@ -86,32 +91,38 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Modules */}
+      {/* Parcours */}
       <section style={{ ...styles.section, background: '#f9fafb', borderRadius: '16px', padding: '2.5rem 1.5rem' }}>
-        <h2 style={styles.sectionTitle}>Modules</h2>
-        <div style={styles.grid3}>
-          {MODULES.map((mod) => (
-            <div
-              key={mod.title}
-              style={{
-                ...styles.moduleCard,
-                ...(mod.status === 'soon' ? styles.moduleCardSoon : {}),
-              }}
-            >
-              <div style={styles.moduleTop}>
-                <span style={styles.moduleIcon}>{mod.icon}</span>
-                {mod.status === 'soon' && <span style={styles.soonBadge}>Bientôt</span>}
-                {mod.status === 'active' && <span style={styles.activeBadge}>Disponible</span>}
+        <h2 style={styles.sectionTitle}>Parcours</h2>
+        <p style={styles.sectionSub}>Progresse étape par étape, module par module.</p>
+        <div style={styles.parcoursGrid}>
+          {PARCOURS.map((mod) => {
+            const dimmed = mod.status !== 'active'
+            return (
+              <div key={mod.title} style={{ ...styles.parcoursCard, opacity: dimmed ? 0.55 : 1 }}>
+                <div style={styles.parcoursLeft}>
+                  <span style={styles.parcoursIcon}>{mod.icon}</span>
+                </div>
+                <div style={styles.parcoursBody}>
+                  <span style={styles.parcoursLevel}>{mod.level}</span>
+                  <h3 style={styles.parcoursTitle}>{mod.title}</h3>
+                  <p style={styles.parcoursDesc}>{mod.desc}</p>
+                </div>
+                <div style={styles.parcoursRight}>
+                  {mod.status === 'active' && (
+                    <>
+                      <span style={styles.activeBadge}>Disponible</span>
+                      <button onClick={() => navigate('/levels')} style={styles.parcoursBtn}>
+                        Jouer →
+                      </button>
+                    </>
+                  )}
+                  {mod.status === 'soon' && <span style={styles.soonBadge}>Bientôt</span>}
+                  {mod.status === 'later' && <span style={styles.laterBadge}>À venir</span>}
+                </div>
               </div>
-              <h3 style={styles.moduleTitle}>{mod.title}</h3>
-              <p style={styles.moduleDesc}>{mod.desc}</p>
-              {mod.status === 'active' && (
-                <button onClick={() => navigate('/levels')} style={styles.moduleBtn}>
-                  Jouer →
-                </button>
-              )}
-            </div>
-          ))}
+            )
+          })}
         </div>
       </section>
 
@@ -132,9 +143,23 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Teaser */}
+      <section style={styles.teaser}>
+        <p style={styles.teaserLabel}>🚀 Le parcours va s'enrichir</p>
+        <p style={styles.teaserText}>
+          De nouveaux modules arrivent progressivement. Le contenu sera débloqué au fil des mises à jour.
+        </p>
+        <div style={styles.teaserChips}>
+          {UPCOMING.map((topic) => (
+            <span key={topic} style={styles.teaserChip}>{topic}</span>
+          ))}
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section style={styles.ctaSection}>
         <h2 style={styles.ctaTitle}>Prêt à arrêter de copier-coller à l'aveugle ?</h2>
+        <p style={styles.ctaSub}>Commence par les bases — Linux / Bash est disponible maintenant.</p>
         <button onClick={() => navigate('/levels')} style={styles.btnPrimary}>
           Commencer maintenant →
         </button>
@@ -258,35 +283,77 @@ const styles = {
     margin: 0,
   },
 
-  /* Module cards */
-  moduleCard: {
-    padding: '1.5rem',
+  /* Parcours */
+  sectionSub: {
+    textAlign: 'center',
+    color: '#6b7280',
+    fontSize: '0.9rem',
+    marginTop: '-1.25rem',
+    marginBottom: '1.75rem',
+  },
+  parcoursGrid: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.875rem',
+  },
+  parcoursCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+    padding: '1.125rem 1.25rem',
     background: '#fff',
     border: '1.5px solid #e5e7eb',
     borderRadius: '14px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem',
+    flexWrap: 'wrap',
   },
-  moduleCardSoon: {
-    opacity: 0.55,
+  parcoursLeft: {
+    flexShrink: 0,
   },
-  moduleTop: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  parcoursIcon: {
+    fontSize: '2rem',
+    lineHeight: 1,
   },
-  moduleIcon: {
-    fontSize: '1.75rem',
+  parcoursBody: {
+    flex: 1,
+    minWidth: '160px',
   },
-  soonBadge: {
+  parcoursLevel: {
     fontSize: '0.7rem',
     fontWeight: '700',
+    color: '#2563eb',
+    textTransform: 'uppercase',
+    letterSpacing: '0.07em',
+    display: 'block',
+    marginBottom: '0.2rem',
+  },
+  parcoursTitle: {
+    fontSize: '1rem',
+    fontWeight: '700',
+    color: '#111827',
+    margin: '0 0 0.25rem',
+  },
+  parcoursDesc: {
+    fontSize: '0.82rem',
     color: '#6b7280',
-    background: '#f3f4f6',
-    border: '1px solid #d1d5db',
-    borderRadius: '999px',
-    padding: '0.2rem 0.6rem',
+    lineHeight: 1.5,
+    margin: 0,
+  },
+  parcoursRight: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: '0.5rem',
+    flexShrink: 0,
+  },
+  parcoursBtn: {
+    padding: '0.45rem 1rem',
+    background: '#2563eb',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '7px',
+    fontSize: '0.85rem',
+    fontWeight: '600',
+    cursor: 'pointer',
   },
   activeBadge: {
     fontSize: '0.7rem',
@@ -297,30 +364,60 @@ const styles = {
     borderRadius: '999px',
     padding: '0.2rem 0.6rem',
   },
-  moduleTitle: {
-    fontSize: '1rem',
+  soonBadge: {
+    fontSize: '0.7rem',
     fontWeight: '700',
-    color: '#111827',
-    margin: 0,
-  },
-  moduleDesc: {
-    fontSize: '0.85rem',
     color: '#6b7280',
-    lineHeight: 1.5,
-    margin: 0,
-    flexGrow: 1,
+    background: '#f3f4f6',
+    border: '1px solid #d1d5db',
+    borderRadius: '999px',
+    padding: '0.2rem 0.6rem',
   },
-  moduleBtn: {
-    marginTop: '0.5rem',
-    padding: '0.5rem 1rem',
-    background: '#2563eb',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '7px',
+  laterBadge: {
+    fontSize: '0.7rem',
+    fontWeight: '700',
+    color: '#9ca3af',
+    background: '#f9fafb',
+    border: '1px solid #e5e7eb',
+    borderRadius: '999px',
+    padding: '0.2rem 0.6rem',
+  },
+
+  /* Teaser */
+  teaser: {
+    textAlign: 'center',
+    marginBottom: '2.5rem',
+    padding: '1.75rem 1.5rem',
+    background: '#f8faff',
+    border: '1px dashed #bfdbfe',
+    borderRadius: '14px',
+  },
+  teaserLabel: {
+    fontSize: '0.9rem',
+    fontWeight: '700',
+    color: '#2563eb',
+    margin: '0 0 0.5rem',
+  },
+  teaserText: {
     fontSize: '0.875rem',
+    color: '#6b7280',
+    margin: '0 0 1rem',
+    lineHeight: 1.55,
+  },
+  teaserChips: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '0.5rem',
+    justifyContent: 'center',
+  },
+  teaserChip: {
+    fontSize: '0.75rem',
     fontWeight: '600',
-    cursor: 'pointer',
-    alignSelf: 'flex-start',
+    color: '#374151',
+    background: '#fff',
+    border: '1px solid #d1d5db',
+    borderRadius: '999px',
+    padding: '0.25rem 0.75rem',
   },
 
   /* Steps */
@@ -386,7 +483,12 @@ const styles = {
     fontSize: '1.3rem',
     fontWeight: '800',
     color: '#1e3a8a',
-    marginBottom: '1.5rem',
+    marginBottom: '0.75rem',
     lineHeight: 1.35,
+  },
+  ctaSub: {
+    fontSize: '0.9rem',
+    color: '#3b82f6',
+    marginBottom: '1.5rem',
   },
 }
