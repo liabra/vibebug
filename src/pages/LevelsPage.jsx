@@ -8,8 +8,16 @@ function getSaved(levelId) {
 
 export default function LevelsPage() {
   const navigate = useNavigate()
+  const levelEntries = Object.entries(bashChallenges)
 
-  function handleStart(levelId) {
+  function isLocked(index) {
+    if (index === 0) return false
+    const prevId = levelEntries[index - 1][0]
+    return !getSaved(prevId)?.completed
+  }
+
+  function handleStart(levelId, locked) {
+    if (locked) return
     const saved = getSaved(levelId)
     if (saved?.completed) {
       localStorage.removeItem(`vibebug_${levelId}`)
@@ -21,16 +29,20 @@ export default function LevelsPage() {
     <div style={styles.container}>
       <h1 style={styles.heading}>Choisissez un niveau</h1>
       <div style={styles.grid}>
-        {Object.entries(bashChallenges).map(([id, level]) => (
-          <LevelCard
-            key={id}
-            id={id}
-            title={level.title}
-            total={level.challenges.length}
-            saved={getSaved(id)}
-            onStart={handleStart}
-          />
-        ))}
+        {levelEntries.map(([id, level], index) => {
+          const locked = isLocked(index)
+          return (
+            <LevelCard
+              key={id}
+              id={id}
+              title={level.title}
+              total={level.challenges.length}
+              saved={getSaved(id)}
+              locked={locked}
+              onStart={(levelId) => handleStart(levelId, locked)}
+            />
+          )
+        })}
       </div>
     </div>
   )

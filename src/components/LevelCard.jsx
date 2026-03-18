@@ -1,27 +1,28 @@
 const STATUS = {
-  new:       { label: 'Nouveau',   color: '#6b7280', bg: '#f9fafb', border: '#e5e7eb' },
-  inProgress:{ label: 'En cours', color: '#d97706', bg: '#fffbeb', border: '#fcd34d' },
-  done:      { label: 'Terminé',  color: '#16a34a', bg: '#f0fdf4', border: '#86efac' },
+  locked:    { label: 'Verrouillé', color: '#9ca3af', bg: '#f3f4f6', border: '#d1d5db' },
+  new:       { label: 'Nouveau',    color: '#6b7280', bg: '#f9fafb', border: '#e5e7eb' },
+  inProgress:{ label: 'En cours',  color: '#d97706', bg: '#fffbeb', border: '#fcd34d' },
+  done:      { label: 'Terminé',   color: '#16a34a', bg: '#f0fdf4', border: '#86efac' },
 }
 
-export default function LevelCard({ id, title, total, saved, onStart }) {
-  const status = !saved ? 'new' : saved.completed ? 'done' : 'inProgress'
+export default function LevelCard({ id, title, total, saved, locked, onStart }) {
+  const status = locked ? 'locked' : !saved ? 'new' : saved.completed ? 'done' : 'inProgress'
   const theme = STATUS[status]
 
-  const btnLabel = status === 'new' ? 'Commencer' : status === 'done' ? 'Rejouer' : 'Continuer'
+  const btnLabel = locked ? '🔒 Verrouillé' : status === 'new' ? 'Commencer' : status === 'done' ? 'Rejouer' : 'Continuer'
 
   return (
-    <div style={{ ...styles.card, background: theme.bg, borderColor: theme.border }}>
+    <div style={{ ...styles.card, background: theme.bg, borderColor: theme.border, opacity: locked ? 0.6 : 1 }}>
       <div style={styles.left}>
         <div style={styles.top}>
-          <span style={styles.title}>{title}</span>
+          <span style={{ ...styles.title, color: locked ? '#9ca3af' : '#111827' }}>{title}</span>
           <span style={{ ...styles.badge, color: theme.color, background: theme.bg, borderColor: theme.color }}>
             {theme.label}
           </span>
         </div>
         <div style={styles.meta}>
           <span style={styles.metaItem}>{total} questions</span>
-          {saved?.xp > 0 && (
+          {!locked && saved?.xp > 0 && (
             <span style={styles.xp}>⚡ {saved.xp} XP</span>
           )}
           {status === 'inProgress' && saved?.currentIndex != null && (
@@ -36,7 +37,11 @@ export default function LevelCard({ id, title, total, saved, onStart }) {
           )}
         </div>
       </div>
-      <button onClick={() => onStart(id)} style={styles.btn}>
+      <button
+        onClick={() => onStart(id)}
+        disabled={locked}
+        style={{ ...styles.btn, ...(locked ? styles.btnLocked : {}) }}
+      >
         {btnLabel}
       </button>
     </div>
@@ -103,5 +108,10 @@ const styles = {
     fontWeight: '600',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
+  },
+  btnLocked: {
+    background: '#d1d5db',
+    color: '#6b7280',
+    cursor: 'not-allowed',
   },
 }
