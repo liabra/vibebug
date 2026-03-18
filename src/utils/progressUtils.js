@@ -49,3 +49,18 @@ export function getTotalXp(levelEntries) {
 export function getCompletedCount(levelEntries) {
   return levelEntries.filter(([id]) => getSaved(id)?.completed === true).length
 }
+
+/**
+ * Retourne le premier niveau "en cours" (non verrouillé, non terminé, avec progression).
+ * Retourne null si aucun niveau n'est en cours.
+ * Format : { id, title, saved }
+ */
+export function getInProgressLevel(levelEntries) {
+  for (let i = 0; i < levelEntries.length; i++) {
+    const [id, level] = levelEntries[i]
+    if (i > 0 && !getSaved(levelEntries[i - 1][0])?.completed) continue
+    const saved = getSaved(id)
+    if (saved && !saved.completed) return { id, title: level.title, saved }
+  }
+  return null
+}

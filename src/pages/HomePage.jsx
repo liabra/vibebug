@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom'
+import { bashChallenges } from '../data/bashChallenges'
+import { getInProgressLevel } from '../utils/progressUtils'
 
 const WHY_ITEMS = [
   {
@@ -52,9 +54,32 @@ const STEPS = [
 
 export default function HomePage() {
   const navigate = useNavigate()
+  const inProgress = getInProgressLevel(Object.entries(bashChallenges))
 
   return (
     <div style={styles.page}>
+
+      {/* Resume banner */}
+      {inProgress && (
+        <div style={styles.resumeCard}>
+          <div style={styles.resumeLeft}>
+            <span style={styles.resumeEyebrow}>↩ Reprendre ta progression</span>
+            <span style={styles.resumeTitle}>{inProgress.title}</span>
+            {inProgress.saved.currentIndex != null && (
+              <span style={styles.resumeMeta}>
+                Question {inProgress.saved.currentIndex + 1} en cours
+                {inProgress.saved.xp > 0 && ` · ⚡ ${inProgress.saved.xp} XP`}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={() => navigate(`/challenge/${inProgress.id}`)}
+            style={styles.resumeBtn}
+          >
+            Continuer →
+          </button>
+        </div>
+      )}
 
       {/* Hero */}
       <section style={styles.hero}>
@@ -176,6 +201,54 @@ const styles = {
     padding: '0 1rem 4rem',
     fontFamily: 'system-ui, sans-serif',
     color: '#111827',
+  },
+
+  /* Resume card */
+  resumeCard: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '1rem',
+    flexWrap: 'wrap',
+    padding: '1rem 1.25rem',
+    background: '#eff6ff',
+    border: '1.5px solid #bfdbfe',
+    borderRadius: '14px',
+    marginTop: '1.5rem',
+    marginBottom: '0',
+  },
+  resumeLeft: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.2rem',
+  },
+  resumeEyebrow: {
+    fontSize: '0.75rem',
+    fontWeight: '700',
+    color: '#2563eb',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+  },
+  resumeTitle: {
+    fontSize: '1rem',
+    fontWeight: '700',
+    color: '#1e3a8a',
+  },
+  resumeMeta: {
+    fontSize: '0.8rem',
+    color: '#3b82f6',
+  },
+  resumeBtn: {
+    flexShrink: 0,
+    padding: '0.6rem 1.25rem',
+    background: '#2563eb',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '0.9rem',
+    fontWeight: '700',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
 
   /* Hero */
