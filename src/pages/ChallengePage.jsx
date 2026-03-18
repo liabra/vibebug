@@ -167,6 +167,7 @@ const styles = {
     border: '1px solid #d1d5db',
     borderRadius: '8px',
     background: '#fff',
+    color: '#111827',
     cursor: 'pointer',
     fontSize: '0.95rem',
     textAlign: 'left',
