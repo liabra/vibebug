@@ -59,7 +59,7 @@ export default function ChallengePage() {
 
   function handleNext() {
     if (isLast) {
-      localStorage.removeItem(STORAGE_KEY)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ completed: true, score, xp, total: challenges.length }))
       navigate('/results', {
         state: {
           score,

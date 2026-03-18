@@ -1,22 +1,35 @@
 import { useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
+import LevelCard from '../components/LevelCard'
+
+function getSaved(levelId) {
+  try { return JSON.parse(localStorage.getItem(`vibebug_${levelId}`)) ?? null } catch { return null }
+}
 
 export default function LevelsPage() {
   const navigate = useNavigate()
+
+  function handleStart(levelId) {
+    const saved = getSaved(levelId)
+    if (saved?.completed) {
+      localStorage.removeItem(`vibebug_${levelId}`)
+    }
+    navigate(`/challenge/${levelId}`)
+  }
 
   return (
     <div style={styles.container}>
       <h1 style={styles.heading}>Choisissez un niveau</h1>
       <div style={styles.grid}>
         {Object.entries(bashChallenges).map(([id, level]) => (
-          <button
+          <LevelCard
             key={id}
-            onClick={() => navigate(`/challenge/${id}`)}
-            style={styles.card}
-          >
-            <span style={styles.cardTitle}>{level.title}</span>
-            <span style={styles.cardCount}>{level.challenges.length} questions</span>
-          </button>
+            id={id}
+            title={level.title}
+            total={level.challenges.length}
+            saved={getSaved(id)}
+            onStart={handleStart}
+          />
         ))}
       </div>
     </div>
@@ -25,41 +38,21 @@ export default function LevelsPage() {
 
 const styles = {
   container: {
-    maxWidth: '600px',
+    maxWidth: '640px',
     margin: '3rem auto',
     padding: '1rem',
     fontFamily: 'system-ui, sans-serif',
-    textAlign: 'center',
   },
   heading: {
     fontSize: '1.75rem',
     fontWeight: '700',
     color: '#111827',
     marginBottom: '2rem',
+    textAlign: 'center',
   },
   grid: {
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
-  },
-  card: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '1.25rem 1.5rem',
-    background: '#fff',
-    border: '1px solid #e5e7eb',
-    borderRadius: '12px',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    transition: 'border-color 0.15s, box-shadow 0.15s',
-  },
-  cardTitle: {
-    fontWeight: '600',
-    color: '#111827',
-  },
-  cardCount: {
-    fontSize: '0.875rem',
-    color: '#6b7280',
   },
 }
