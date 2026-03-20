@@ -170,6 +170,38 @@ export const bashChallenges = {
         explanation:
           "Le `$` devant un nom de variable permet d'accéder à sa valeur. `echo $PATH` affiche les répertoires où bash cherche les exécutables.",
       },
+      {
+        id: 6,
+        type: "fix",
+        title: "Script refusé",
+        prompt: "L'IA vient de générer ce script de setup. Tu essaies de le lancer et tu obtiens cette erreur. Quelle est la cause et la solution ?",
+        code: "$ ./setup.sh\nbash: ./setup.sh: Permission denied",
+        options: [
+          "Le fichier est corrompu — il faut le recréer",
+          "Il manque le droit d'exécution — lancer `chmod +x setup.sh` d'abord",
+          "Il faut obligatoirement lancer le script avec `sudo`",
+          "bash n'est pas installé sur ce système",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "Un fichier créé (par l'IA ou autrement) n'a pas le bit exécutable par défaut. `chmod +x setup.sh` ajoute ce droit. Ensuite seulement, `./setup.sh` fonctionne.",
+      },
+      {
+        id: 7,
+        type: "find_error",
+        title: "Le log qui disparaît",
+        prompt: "Ce script de déploiement devait tenir un historique. Après 5 exécutions, il n'y a qu'une seule ligne dans le fichier. Trouve le problème.",
+        code: 'echo "$(date) - déploiement OK" > deploy.log',
+        options: [
+          "`$(date)` n'est pas évalué à l'intérieur de echo",
+          "L'opérateur `>` écrase le fichier à chaque exécution",
+          "Le fichier deploy.log n'existait pas au premier lancement",
+          "echo ne supporte pas les sous-commandes",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "`>` redirige en mode écrasement. Pour accumuler les entrées sans perdre l'historique, il faut `>>` (append). Erreur classique dans les scripts de log générés par IA.",
+      },
     ],
   },
   3: {
@@ -249,6 +281,37 @@ export const bashChallenges = {
         correctAnswer: 1,
         explanation:
           "`trap` enregistre une commande à exécuter lors d'un signal. `EXIT` se déclenche à la fin du script (normal ou erreur), utile pour nettoyer.",
+      },
+      {
+        id: 6,
+        type: "ai_error",
+        title: "Tuer à la brutale",
+        prompt: "Nginx répond lentement. L'IA te propose cette commande pour le « redémarrer proprement ». Est-ce vraiment la bonne approche ?",
+        code: "kill -9 $(pgrep nginx)",
+        options: [
+          "Oui, c'est la méthode recommandée pour redémarrer un service",
+          "Non — `kill -9` (SIGKILL) force l'arrêt brutal sans laisser nginx fermer ses connexions",
+          "Non — la syntaxe `$()` est invalide dans ce contexte",
+          "Non — `pgrep` ne fonctionne qu'avec les processus système",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "SIGKILL (-9) ne peut pas être intercepté : le processus est tué immédiatement, sans fermer les fichiers ni les connexions actives. Pour nginx, préférer `systemctl reload nginx` (rechargement sans downtime) ou `systemctl restart nginx`.",
+      },
+      {
+        id: 7,
+        type: "fix",
+        title: "Service injoignable",
+        prompt: "Une API que tu as déployée tourne normalement sur le port 8080. Un collègue dit qu'elle ne répond plus. Quelle commande utilises-tu en premier pour diagnostiquer ?",
+        options: [
+          "`ping localhost` — pour vérifier que la machine répond",
+          "`curl -I http://localhost:8080` — pour voir le code de réponse HTTP",
+          "`cat /var/log/syslog | grep 8080` — pour fouiller les logs",
+          "`ls /etc/nginx/sites-enabled/` — pour vérifier la config nginx",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "`curl -I` envoie une requête HEAD et affiche immédiatement le code HTTP (200, 502, connexion refusée…). `ping` ne teste que la connectivité réseau, pas le service. Les logs viennent après pour approfondir.",
       },
     ],
   },
