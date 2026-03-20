@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
-import { getSaved, getLevelStatus, getBadge, getTotalXp, getCompletedCount, getUsername, setUsername } from '../utils/progressUtils'
+import { getSaved, getLevelStatus, getBadge, getTotalXp, getCompletedCount, getGlobalStats, getUsername, setUsername } from '../utils/progressUtils'
 
 const STATUS_META = {
   locked:    { label: 'Verrouillé', color: '#9ca3af', bg: '#f3f4f6', border: '#d1d5db' },
@@ -33,6 +33,7 @@ export default function ProfilePage() {
   const completedCount = getCompletedCount(levelEntries)
   const globalPct      = Math.round((completedCount / total) * 100)
   const badges         = levels.map(l => l.badge).filter(Boolean)
+  const stats          = getGlobalStats(levelEntries)
 
   return (
     <div style={styles.page}>
@@ -147,6 +148,33 @@ export default function ProfilePage() {
               </div>
             )
           })}
+        </div>
+      </div>
+
+      {/* Statistiques */}
+      <div style={styles.section}>
+        <h2 style={styles.sectionTitle}>Statistiques</h2>
+        <div style={styles.statsGrid}>
+          <div style={styles.statCell}>
+            <span style={styles.statCellValue}>{stats.totalAnswered}</span>
+            <span style={styles.statCellLabel}>Questions répondues</span>
+          </div>
+          <div style={styles.statCell}>
+            <span style={styles.statCellValue}>{stats.totalCorrect}</span>
+            <span style={styles.statCellLabel}>Bonnes réponses</span>
+          </div>
+          <div style={styles.statCell}>
+            <span style={styles.statCellValue}>
+              {stats.successRate !== null ? `${stats.successRate} %` : '—'}
+            </span>
+            <span style={styles.statCellLabel}>Taux de réussite</span>
+          </div>
+          <div style={styles.statCell}>
+            <span style={styles.statCellValue}>
+              {stats.bestPct !== null ? `${stats.bestPct} %` : '—'}
+            </span>
+            <span style={styles.statCellLabel}>Meilleur score</span>
+          </div>
         </div>
       </div>
 
@@ -283,6 +311,35 @@ const styles = {
     fontSize: '0.72rem',
     color: '#6b7280',
     textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: '0.04em',
+    fontWeight: '600',
+  },
+  statsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '0.75rem',
+  },
+  statCell: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '0.25rem',
+    padding: '1rem 0.75rem',
+    background: '#f9fafb',
+    border: '1px solid #e5e7eb',
+    borderRadius: '12px',
+    textAlign: 'center',
+  },
+  statCellValue: {
+    fontSize: '1.5rem',
+    fontWeight: '800',
+    color: '#111827',
+    lineHeight: 1,
+  },
+  statCellLabel: {
+    fontSize: '0.72rem',
+    color: '#6b7280',
     textTransform: 'uppercase',
     letterSpacing: '0.04em',
     fontWeight: '600',

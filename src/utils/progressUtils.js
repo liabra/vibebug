@@ -64,6 +64,44 @@ export function setUsername(name) {
 }
 
 /**
+ * Statistiques globales calculées depuis les données localStorage existantes.
+ * Compatible avec les anciennes sauvegardes : chaque champ manquant est ignoré.
+ *
+ * - totalAnswered : questions répondues (exact pour niveaux terminés,
+ *                  approximatif via currentIndex pour niveaux en cours)
+ * - totalCorrect  : bonnes réponses cumulées
+ * - successRate   : pourcentage global (null si aucune donnée)
+ * - bestPct       : meilleur score sur un niveau terminé (null si aucun)
+ */
+export function getGlobalStats(levelEntries) {
+  let totalAnswered = 0
+  let totalCorrect = 0
+  let bestPct = null
+
+  for (const [id] of levelEntries) {
+    const saved = getSaved(id)
+    if (!saved) continue
+
+    if (saved.completed && saved.total != null) {
+      totalAnswered += saved.total
+      totalCorrect += saved.score ?? 0
+      const pct = Math.round(((saved.score ?? 0) / saved.total) * 100)
+      if (bestPct === null || pct > bestPct) bestPct = pct
+    } else if (!saved.completed && saved.currentIndex > 0) {
+      // currentIndex = prochain index à afficher = nombre de questions déjà répondues
+      totalAnswered += saved.currentIndex
+      totalCorrect += saved.score ?? 0
+    }
+  }
+
+  const successRate = totalAnswered > 0
+    ? Math.round((totalCorrect / totalAnswered) * 100)
+    : null
+
+  return { totalAnswered, totalCorrect, successRate, bestPct }
+}
+
+/**
  * Retourne le premier niveau "en cours" (non verrouillé, non terminé, avec progression).
  * Retourne null si aucun niveau n'est en cours.
  * Format : { id, title, saved }
