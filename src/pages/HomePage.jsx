@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
-import { getInProgressLevel } from '../utils/progressUtils'
+import { getInProgressLevel, getUsername } from '../utils/progressUtils'
 
 const WHY_ITEMS = [
   {
@@ -55,6 +55,7 @@ const STEPS = [
 export default function HomePage() {
   const navigate = useNavigate()
   const inProgress = getInProgressLevel(Object.entries(bashChallenges))
+  const username = getUsername()
 
   return (
     <div style={styles.page}>
@@ -83,7 +84,10 @@ export default function HomePage() {
 
       {/* Hero */}
       <section style={styles.hero}>
-        <div style={styles.heroBadge}>⚡ Vibecoding intelligent</div>
+        {username
+          ? <div style={styles.heroBadge}>Salut {username} 👋</div>
+          : <div style={styles.heroBadge}>⚡ Vibecoding intelligent</div>
+        }
         <h1 style={styles.heroTitle}>
           Apprends à débugger<br />
           <span style={styles.heroAccent}>comme un vrai dev</span>

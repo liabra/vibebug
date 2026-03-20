@@ -1,12 +1,15 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
-import { getSaved, getLevelStatus, getBadge, getTotalXp, getCompletedCount } from '../utils/progressUtils'
+import { getSaved, getLevelStatus, getBadge, getTotalXp, getCompletedCount, getUsername, setUsername } from '../utils/progressUtils'
 
 // --- component ---------------------------------------------------------------
 
 export default function ProfilePage() {
   const navigate = useNavigate()
   const levelEntries = Object.entries(bashChallenges)
+  const [username, setUsernameState] = useState(getUsername)
+  const [inputValue, setInputValue] = useState(getUsername)
   const total = levelEntries.length
 
   const levels = levelEntries.map(([id, level], index) => {
@@ -37,8 +40,39 @@ export default function ProfilePage() {
       <div style={styles.header}>
         <div style={styles.avatar}>🧑‍💻</div>
         <div>
-          <h1 style={styles.heading}>Mon Profil</h1>
+          <h1 style={styles.heading}>{username || 'Mon Profil'}</h1>
           <p style={styles.subheading}>Progression Vibebug</p>
+        </div>
+      </div>
+
+      {/* Username editor */}
+      <div style={styles.usernameBox}>
+        <label style={styles.usernameLabel} htmlFor="username-input">Ton pseudo</label>
+        <div style={styles.usernameRow}>
+          <input
+            id="username-input"
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setUsername(inputValue)
+                setUsernameState(inputValue.trim())
+              }
+            }}
+            placeholder="Choisis un pseudo…"
+            maxLength={24}
+            style={styles.usernameInput}
+          />
+          <button
+            onClick={() => {
+              setUsername(inputValue)
+              setUsernameState(inputValue.trim())
+            }}
+            style={styles.usernameSave}
+          >
+            Enregistrer
+          </button>
         </div>
       </div>
 
@@ -175,6 +209,47 @@ const styles = {
     fontSize: '0.875rem',
     color: '#6b7280',
     margin: '0.2rem 0 0',
+  },
+  usernameBox: {
+    marginBottom: '1.75rem',
+    padding: '1rem 1.25rem',
+    background: '#f9fafb',
+    border: '1px solid #e5e7eb',
+    borderRadius: '12px',
+  },
+  usernameLabel: {
+    display: 'block',
+    fontSize: '0.75rem',
+    fontWeight: '700',
+    color: '#6b7280',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    marginBottom: '0.5rem',
+  },
+  usernameRow: {
+    display: 'flex',
+    gap: '0.5rem',
+  },
+  usernameInput: {
+    flex: 1,
+    padding: '0.5rem 0.75rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '8px',
+    fontSize: '0.95rem',
+    fontFamily: 'system-ui, sans-serif',
+    color: '#111827',
+    outline: 'none',
+  },
+  usernameSave: {
+    flexShrink: 0,
+    padding: '0.5rem 1rem',
+    background: '#2563eb',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '0.875rem',
+    fontWeight: '600',
+    cursor: 'pointer',
   },
   statsRow: {
     display: 'grid',

@@ -51,6 +51,19 @@ export function getCompletedCount(levelEntries) {
 }
 
 /**
+ * Pseudo du joueur stocké en localStorage.
+ */
+export function getUsername() {
+  return localStorage.getItem('vibebug_username') ?? ''
+}
+
+export function setUsername(name) {
+  const trimmed = name.trim()
+  if (trimmed) localStorage.setItem('vibebug_username', trimmed)
+  else localStorage.removeItem('vibebug_username')
+}
+
+/**
  * Retourne le premier niveau "en cours" (non verrouillé, non terminé, avec progression).
  * Retourne null si aucun niveau n'est en cours.
  * Format : { id, title, saved }
