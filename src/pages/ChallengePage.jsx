@@ -2,6 +2,13 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
 
+const MISSION_META = {
+  explain:    { icon: '🧠', label: 'Comprendre',       color: '#1d4ed8', bg: '#eff6ff', directive: 'Analyse ce code et comprends son comportement.' },
+  find_error: { icon: '🔍', label: 'Trouver l\'erreur', color: '#b45309', bg: '#fffbeb', directive: 'Quelque chose cloche ici. Trouve ce qui ne va pas.' },
+  fix:        { icon: '🛠', label: 'Corriger',          color: '#7c3aed', bg: '#f5f3ff', directive: 'Cette commande a un problème. Comment la corriger ?' },
+  ai_error:   { icon: '🤖', label: 'Piège IA',          color: '#be123c', bg: '#fff1f2', directive: 'L\'IA t\'a proposé ce code. Est-ce vraiment correct ?' },
+}
+
 function loadProgress(key) {
   try { return JSON.parse(localStorage.getItem(key)) ?? {} } catch { return {} }
 }
@@ -155,8 +162,20 @@ export default function ChallengePage() {
         />
       </div>
 
-      <h2 style={styles.title}>{challenge.title}</h2>
-      <p style={styles.prompt}>{challenge.prompt}</p>
+      {(() => {
+        const mission = MISSION_META[challenge.type]
+        return (
+          <>
+            {mission && (
+              <div style={{ ...styles.missionBadge, color: mission.color, background: mission.bg }}>
+                {mission.icon} {mission.label}
+              </div>
+            )}
+            <h2 style={styles.title}>{challenge.title}</h2>
+            <p style={styles.prompt}>{mission?.directive ?? challenge.prompt}</p>
+          </>
+        )
+      })()}
 
       {challenge.code && (
         <pre style={styles.code}>
@@ -262,6 +281,18 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: '0.75rem',
+  },
+  missionBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '0.35rem',
+    padding: '0.3rem 0.75rem',
+    borderRadius: '999px',
+    fontSize: '0.78rem',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
     marginBottom: '0.75rem',
   },
   progressBar: {

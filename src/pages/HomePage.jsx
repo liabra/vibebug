@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
 import { getInProgressLevel, getUsername } from '../utils/progressUtils'
+import { modules } from '../data/modules'
 
 const WHY_ITEMS = [
   {
@@ -20,29 +21,15 @@ const WHY_ITEMS = [
   },
 ]
 
-const PARCOURS = [
-  {
-    level: 'Découverte',
-    icon: '🐧',
-    title: 'Linux / Bash',
-    desc: 'Commandes, permissions, scripts, pipes — les fondations incontournables du développeur moderne.',
-    status: 'active',
-  },
-  {
-    level: 'Pratique',
-    icon: '⚙️',
-    title: 'Automatisation',
-    desc: 'Cron, CI/CD, scripts Python — apprends à automatiser sans introduire de bugs silencieux.',
-    status: 'soon',
-  },
-  {
-    level: 'Avancé',
-    icon: '☁️',
-    title: 'Cloud / Déploiement',
-    desc: 'Docker, Nginx, VPS — déploie en comprenant ce que tu fais, pas en espérant que ça marche.',
-    status: 'later',
-  },
-]
+// Source unique : src/data/modules.js
+const PARCOURS = modules.map(m => ({
+  level: m.track,
+  icon: m.icon,
+  title: m.title,
+  desc: m.desc,
+  status: m.status,
+  path: m.path,
+}))
 
 const UPCOMING = ['Git avancé', 'Sécurité web', 'API & REST', 'Bases de données', 'Tests & CI']
 
@@ -141,7 +128,7 @@ export default function HomePage() {
                   {mod.status === 'active' && (
                     <>
                       <span style={styles.activeBadge}>Disponible</span>
-                      <button onClick={() => navigate('/levels')} style={styles.parcoursBtn}>
+                      <button onClick={() => navigate(mod.path)} style={styles.parcoursBtn}>
                         Jouer →
                       </button>
                     </>

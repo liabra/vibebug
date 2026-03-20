@@ -1,9 +1,13 @@
+// Chaque challenge peut avoir un champ `type` (voir CHALLENGE_TYPES dans modules.js).
+// Les challenges sans `type` sont traités comme 'find_error' par défaut.
+// Ce champ est ignoré par les composants actuels — il prépare l'évolution future.
 export const bashChallenges = {
   1: {
     title: "Débutant",
     challenges: [
       {
         id: 1,
+        type: "explain",
         title: "Lister les fichiers",
         prompt: "Que fait cette commande ?",
         code: "ls -la",
@@ -19,6 +23,7 @@ export const bashChallenges = {
       },
       {
         id: 2,
+        type: "explain",
         title: "Changer de répertoire",
         prompt: "Que fait cette commande ?",
         code: "cd ..",
@@ -34,6 +39,7 @@ export const bashChallenges = {
       },
       {
         id: 3,
+        type: "explain",
         title: "Afficher le contenu",
         prompt: "Quelle commande permet d'afficher le contenu d'un fichier ?",
         code: "cat fichier.txt",
@@ -49,6 +55,7 @@ export const bashChallenges = {
       },
       {
         id: 4,
+        type: "explain",
         title: "Copier un fichier",
         prompt: "Que fait cette commande ?",
         code: "cp source.txt destination.txt",
@@ -64,6 +71,7 @@ export const bashChallenges = {
       },
       {
         id: 5,
+        type: "explain",
         title: "Chemin courant",
         prompt: "À quoi sert cette commande ?",
         code: "pwd",
@@ -84,6 +92,7 @@ export const bashChallenges = {
     challenges: [
       {
         id: 1,
+        type: "explain",
         title: "Permissions",
         prompt: "Que fait cette commande ?",
         code: "chmod 755 script.sh",
@@ -99,6 +108,7 @@ export const bashChallenges = {
       },
       {
         id: 2,
+        type: "explain",
         title: "Recherche dans les fichiers",
         prompt: "Que fait cette commande ?",
         code: 'grep -r "erreur" /var/log/',
@@ -114,6 +124,7 @@ export const bashChallenges = {
       },
       {
         id: 3,
+        type: "find_error",
         title: "Redirection",
         prompt: "Que fait l'opérateur `>>` dans cette commande ?",
         code: 'echo "nouvelle ligne" >> fichier.txt',
@@ -129,6 +140,7 @@ export const bashChallenges = {
       },
       {
         id: 4,
+        type: "explain",
         title: "Pipeline",
         prompt: "Que fait le pipe `|` dans cette commande ?",
         code: "ps aux | grep nginx",
@@ -144,6 +156,7 @@ export const bashChallenges = {
       },
       {
         id: 5,
+        type: "explain",
         title: "Variables d'environnement",
         prompt: "Comment afficher la valeur de la variable PATH ?",
         code: "echo $PATH",
@@ -164,6 +177,7 @@ export const bashChallenges = {
     challenges: [
       {
         id: 1,
+        type: "explain",
         title: "Substitution de commande",
         prompt: "Que fait cette syntaxe ?",
         code: "DATE=$(date +%Y-%m-%d)\necho \"Aujourd'hui : $DATE\"",
@@ -179,6 +193,7 @@ export const bashChallenges = {
       },
       {
         id: 2,
+        type: "find_error",
         title: "Boucle for",
         prompt: "Combien de fois 'hello' sera-t-il affiché ?",
         code: "for i in 1 2 3 4 5; do\n  echo 'hello'\ndone",
@@ -189,6 +204,7 @@ export const bashChallenges = {
       },
       {
         id: 3,
+        type: "fix",
         title: "Test conditionnel",
         prompt: "Que vérifie cette condition ?",
         code: 'if [ -f "config.json" ]; then\n  echo "Fichier trouvé"\nfi',
@@ -204,6 +220,7 @@ export const bashChallenges = {
       },
       {
         id: 4,
+        type: "fix",
         title: "xargs",
         prompt: "Que fait cette commande ?",
         code: 'find . -name "*.log" | xargs rm',
@@ -219,6 +236,7 @@ export const bashChallenges = {
       },
       {
         id: 5,
+        type: "ai_error",
         title: "Trap et signaux",
         prompt: "À quoi sert cette ligne dans un script ?",
         code: 'trap "rm -f /tmp/lockfile" EXIT',
