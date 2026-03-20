@@ -18,6 +18,14 @@ export default function LevelsPage() {
     navigate(`/challenge/${levelId}`)
   }
 
+  function handleStartTrap() {
+    const saved = getSaved('ai')
+    if (saved?.completed) {
+      localStorage.removeItem('vibebug_ai')
+    }
+    navigate('/challenge/ai')
+  }
+
   return (
     <div style={styles.container}>
       <h1 style={styles.heading}>Choisissez un niveau</h1>
@@ -37,6 +45,24 @@ export default function LevelsPage() {
             />
           )
         })}
+      </div>
+
+      <div style={styles.separator}>
+        <span style={styles.separatorLine} />
+        <span style={styles.separatorLabel}>Mode spécial</span>
+        <span style={styles.separatorLine} />
+      </div>
+
+      <div style={styles.trapCard}>
+        <div style={styles.trapLeft}>
+          <span style={styles.trapTitle}>🤖 Piège IA</span>
+          <span style={styles.trapDesc}>
+            Repère ce que l'IA te ferait croire — des patterns plausibles mais incorrects, tirés de toutes les missions.
+          </span>
+        </div>
+        <button onClick={handleStartTrap} style={styles.trapBtn}>
+          {getSaved('ai')?.completed ? 'Rejouer' : 'Lancer'}
+        </button>
       </div>
     </div>
   )
@@ -60,5 +86,62 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
+  },
+  separator: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+    margin: '2rem 0 1rem',
+  },
+  separatorLine: {
+    flex: 1,
+    height: '1px',
+    background: '#e5e7eb',
+    display: 'block',
+  },
+  separatorLabel: {
+    fontSize: '0.72rem',
+    fontWeight: '700',
+    color: '#9ca3af',
+    textTransform: 'uppercase',
+    letterSpacing: '0.06em',
+    whiteSpace: 'nowrap',
+  },
+  trapCard: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '1.25rem 1.5rem',
+    background: '#fff1f2',
+    border: '1.5px solid #fda4af',
+    borderRadius: '14px',
+    gap: '1rem',
+  },
+  trapLeft: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.375rem',
+  },
+  trapTitle: {
+    fontWeight: '700',
+    fontSize: '1rem',
+    color: '#9f1239',
+  },
+  trapDesc: {
+    fontSize: '0.82rem',
+    color: '#be123c',
+    lineHeight: '1.4',
+  },
+  trapBtn: {
+    flexShrink: 0,
+    padding: '0.6rem 1.25rem',
+    background: '#be123c',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '0.9rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
 }

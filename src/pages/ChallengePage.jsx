@@ -29,12 +29,18 @@ export default function ChallengePage() {
   const { levelId } = useParams()
   const navigate = useNavigate()
 
-  const level = bashChallenges[levelId]
+  const isAiMode = levelId === 'ai'
+  const level = isAiMode ? null : bashChallenges[levelId]
+  const levelTitle = isAiMode ? '🤖 Piège IA' : level?.title
+  const challengePool = isAiMode
+    ? Object.values(bashChallenges).flatMap((l) => l.challenges).filter((c) => c.type === 'ai_error')
+    : level?.challenges ?? []
+
   const STORAGE_KEY = `vibebug_${levelId}`
   const savedProgress = loadProgress(STORAGE_KEY)
 
   const [challenges] = useState(() =>
-    pickChallenges(level?.challenges ?? [], MISSIONS_PER_SESSION, savedProgress.challengeIds)
+    pickChallenges(challengePool, MISSIONS_PER_SESSION, savedProgress.challengeIds)
   )
 
   const [currentIndex, setCurrentIndex] = useState(() => savedProgress.currentIndex ?? 0)
@@ -57,7 +63,7 @@ export default function ChallengePage() {
     return () => clearTimeout(t)
   }, [xpFlash])
 
-  if (!level) {
+  if (!isAiMode && !level) {
     return (
       <div style={styles.container}>
         <p>Niveau introuvable.</p>
@@ -92,7 +98,7 @@ export default function ChallengePage() {
           score,
           xp,
           total: challenges.length,
-          levelTitle: level.title,
+          levelTitle,
         },
       })
       return
@@ -150,8 +156,8 @@ export default function ChallengePage() {
       )}
 
       <div style={styles.header}>
-        <span style={styles.level}>
-          {level.title}
+        <span style={{ ...styles.level, ...(isAiMode ? styles.levelAiMode : {}) }}>
+          {levelTitle}
           {(currentIndex > 0 || score > 0) && (
             <button onClick={handleRestart} style={styles.btnRestart} title="Recommencer">
               ↺
@@ -181,9 +187,15 @@ export default function ChallengePage() {
         />
       </div>
 
-      {level.challenges.length > challenges.length && (
+      {isAiMode && (
+        <div style={styles.aiModeBanner}>
+          Repère ce qui semble crédible mais ne l'est pas — ces patterns sont souvent générés sans avertissement par les IA.
+        </div>
+      )}
+
+      {!isAiMode && challengePool.length > challenges.length && (
         <p style={styles.sessionHint}>
-          🎲 {challenges.length} missions sélectionnées sur {level.challenges.length} — la sélection varie à chaque partie
+          🎲 {challenges.length} missions sélectionnées sur {challengePool.length} — la sélection varie à chaque partie
         </p>
       )}
 
@@ -322,6 +334,21 @@ const styles = {
     color: '#9f1239',
     marginBottom: '0.75rem',
     lineHeight: '1.4',
+  },
+  levelAiMode: {
+    color: '#be123c',
+    fontWeight: '700',
+  },
+  aiModeBanner: {
+    padding: '0.75rem 1rem',
+    background: '#fff1f2',
+    border: '1px solid #fda4af',
+    borderLeft: '4px solid #be123c',
+    borderRadius: '8px',
+    fontSize: '0.875rem',
+    color: '#9f1239',
+    lineHeight: '1.5',
+    marginBottom: '1.25rem',
   },
   sessionHint: {
     fontSize: '0.78rem',
