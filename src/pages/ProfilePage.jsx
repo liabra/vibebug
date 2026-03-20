@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
 import { getSaved, getLevelStatus, getBadge, getTotalXp, getCompletedCount, getUsername, setUsername } from '../utils/progressUtils'
 
+const STATUS_META = {
+  locked:    { label: 'Verrouillé', color: '#9ca3af', bg: '#f3f4f6', border: '#d1d5db' },
+  new:       { label: 'Nouveau',    color: '#6b7280', bg: '#f9fafb', border: '#e5e7eb' },
+  inProgress:{ label: 'En cours',  color: '#d97706', bg: '#fffbeb', border: '#fcd34d' },
+  done:      { label: 'Terminé',   color: '#16a34a', bg: '#f0fdf4', border: '#86efac' },
+}
+
 // --- component ---------------------------------------------------------------
 
 export default function ProfilePage() {
