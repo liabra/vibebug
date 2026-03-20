@@ -171,6 +171,11 @@ export default function ChallengePage() {
                 {mission.icon} {mission.label}
               </div>
             )}
+            {challenge.type === 'ai_error' && (
+              <div style={styles.aiWarning}>
+                ⚠️ Ce code a été généré par une IA — analyse-le attentivement avant de répondre.
+              </div>
+            )}
             <h2 style={styles.title}>{challenge.title}</h2>
             <p style={styles.prompt}>{mission?.directive ?? challenge.prompt}</p>
           </>
@@ -282,6 +287,16 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '0.75rem',
+  },
+  aiWarning: {
+    padding: '0.6rem 1rem',
+    background: '#fff1f2',
+    border: '1px solid #fda4af',
+    borderRadius: '8px',
+    fontSize: '0.85rem',
+    color: '#9f1239',
+    marginBottom: '0.75rem',
+    lineHeight: '1.4',
   },
   missionBadge: {
     display: 'inline-flex',

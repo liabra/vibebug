@@ -108,7 +108,7 @@ export const bashChallenges = {
       },
       {
         id: 2,
-        type: "explain",
+        type: "find_error",
         title: "Recherche dans les fichiers",
         prompt: "Que fait cette commande ?",
         code: 'grep -r "erreur" /var/log/',
@@ -140,7 +140,7 @@ export const bashChallenges = {
       },
       {
         id: 4,
-        type: "explain",
+        type: "fix",
         title: "Pipeline",
         prompt: "Que fait le pipe `|` dans cette commande ?",
         code: "ps aux | grep nginx",
@@ -220,7 +220,7 @@ export const bashChallenges = {
       },
       {
         id: 4,
-        type: "fix",
+        type: "ai_error",
         title: "xargs",
         prompt: "Que fait cette commande ?",
         code: 'find . -name "*.log" | xargs rm',
