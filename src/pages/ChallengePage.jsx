@@ -2,6 +2,18 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
 
+const MISSIONS_PER_SESSION = 5
+
+function pickChallenges(all, n, savedIds) {
+  if (savedIds?.length) {
+    const set = new Set(savedIds)
+    const restored = all.filter((c) => set.has(c.id))
+    if (restored.length > 0) return restored
+  }
+  if (all.length <= n) return all
+  return [...all].sort(() => Math.random() - 0.5).slice(0, n)
+}
+
 const MISSION_META = {
   explain:    { icon: '🧠', label: 'Comprendre',       color: '#1d4ed8', bg: '#eff6ff', directive: 'Analyse ce code et comprends son comportement.' },
   find_error: { icon: '🔍', label: 'Trouver l\'erreur', color: '#b45309', bg: '#fffbeb', directive: 'Quelque chose cloche ici. Trouve ce qui ne va pas.' },
@@ -18,18 +30,25 @@ export default function ChallengePage() {
   const navigate = useNavigate()
 
   const level = bashChallenges[levelId]
-  const challenges = level?.challenges ?? []
   const STORAGE_KEY = `vibebug_${levelId}`
+  const savedProgress = loadProgress(STORAGE_KEY)
 
-  const [currentIndex, setCurrentIndex] = useState(() => loadProgress(STORAGE_KEY).currentIndex ?? 0)
+  const [challenges] = useState(() =>
+    pickChallenges(level?.challenges ?? [], MISSIONS_PER_SESSION, savedProgress.challengeIds)
+  )
+
+  const [currentIndex, setCurrentIndex] = useState(() => savedProgress.currentIndex ?? 0)
   const [selectedAnswer, setSelectedAnswer] = useState(null)
-  const [score, setScore] = useState(() => loadProgress(STORAGE_KEY).score ?? 0)
-  const [xp, setXp] = useState(() => loadProgress(STORAGE_KEY).xp ?? 0)
+  const [score, setScore] = useState(() => savedProgress.score ?? 0)
+  const [xp, setXp] = useState(() => savedProgress.xp ?? 0)
   const [xpFlash, setXpFlash] = useState(false)
   const [confirmTarget, setConfirmTarget] = useState(null)
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ currentIndex, score, xp }))
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ currentIndex, score, xp, challengeIds: challenges.map((c) => c.id) })
+    )
   }, [currentIndex, score, xp])
 
   useEffect(() => {
@@ -161,6 +180,12 @@ export default function ChallengePage() {
           }}
         />
       </div>
+
+      {level.challenges.length > challenges.length && (
+        <p style={styles.sessionHint}>
+          🎲 {challenges.length} missions sélectionnées sur {level.challenges.length} — la sélection varie à chaque partie
+        </p>
+      )}
 
       {(() => {
         const mission = MISSION_META[challenge.type]
@@ -297,6 +322,12 @@ const styles = {
     color: '#9f1239',
     marginBottom: '0.75rem',
     lineHeight: '1.4',
+  },
+  sessionHint: {
+    fontSize: '0.78rem',
+    color: '#6b7280',
+    fontStyle: 'italic',
+    margin: '0 0 1.25rem',
   },
   missionBadge: {
     display: 'inline-flex',

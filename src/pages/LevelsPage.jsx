@@ -3,6 +3,8 @@ import { bashChallenges } from '../data/bashChallenges'
 import LevelCard from '../components/LevelCard'
 import { getSaved, getLevelStatus } from '../utils/progressUtils'
 
+const MISSIONS_PER_SESSION = 5
+
 export default function LevelsPage() {
   const navigate = useNavigate()
   const levelEntries = Object.entries(bashChallenges)
@@ -27,7 +29,8 @@ export default function LevelsPage() {
               key={id}
               id={id}
               title={level.title}
-              total={level.challenges.length}
+              poolSize={level.challenges.length}
+              sessionSize={Math.min(MISSIONS_PER_SESSION, level.challenges.length)}
               saved={getSaved(id)}
               locked={locked}
               onStart={(levelId) => handleStart(levelId, locked)}

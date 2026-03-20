@@ -5,9 +5,10 @@ const STATUS = {
   done:      { label: 'Terminé',   color: '#16a34a', bg: '#f0fdf4', border: '#86efac' },
 }
 
-export default function LevelCard({ id, title, total, saved, locked, onStart }) {
+export default function LevelCard({ id, title, poolSize, sessionSize, saved, locked, onStart }) {
   const status = locked ? 'locked' : !saved ? 'new' : saved.completed ? 'done' : 'inProgress'
   const theme = STATUS[status]
+  const hasVariety = poolSize > sessionSize
 
   const btnLabel = locked ? '🔒 Verrouillé' : status === 'new' ? 'Commencer' : status === 'done' ? 'Rejouer' : 'Continuer'
 
@@ -21,18 +22,25 @@ export default function LevelCard({ id, title, total, saved, locked, onStart }) 
           </span>
         </div>
         <div style={styles.meta}>
-          <span style={styles.metaItem}>{total} questions</span>
+          {hasVariety ? (
+            <>
+              <span style={styles.metaItem}>{sessionSize} missions sur {poolSize}</span>
+              <span style={styles.replayChip}>🎲 varie à chaque partie</span>
+            </>
+          ) : (
+            <span style={styles.metaItem}>{sessionSize} missions</span>
+          )}
           {!locked && saved?.xp > 0 && (
             <span style={styles.xp}>⚡ {saved.xp} XP</span>
           )}
           {status === 'inProgress' && saved?.currentIndex != null && (
             <span style={styles.metaItem}>
-              Question {saved.currentIndex + 1} / {total}
+              Mission {saved.currentIndex + 1} / {sessionSize}
             </span>
           )}
           {status === 'done' && saved?.score != null && (
             <span style={styles.metaItem}>
-              Score : {saved.score} / {saved.total ?? total}
+              Score : {saved.score} / {saved.total ?? sessionSize}
             </span>
           )}
         </div>
@@ -91,6 +99,11 @@ const styles = {
   metaItem: {
     fontSize: '0.8rem',
     color: '#6b7280',
+  },
+  replayChip: {
+    fontSize: '0.75rem',
+    color: '#7c3aed',
+    fontWeight: '600',
   },
   xp: {
     fontSize: '0.8rem',
