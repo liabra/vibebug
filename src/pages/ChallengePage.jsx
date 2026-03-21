@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
+import { automationChallenges } from '../data/automationChallenges'
+
+const ALL_CHALLENGES = { ...bashChallenges, ...automationChallenges }
 
 const MISSIONS_PER_SESSION = 5
 
@@ -30,7 +33,7 @@ export default function ChallengePage() {
   const navigate = useNavigate()
 
   const isAiMode = levelId === 'ai'
-  const level = isAiMode ? null : bashChallenges[levelId]
+  const level = isAiMode ? null : ALL_CHALLENGES[levelId]
   const levelTitle = isAiMode ? '🤖 Piège IA' : level?.title
   const challengePool = isAiMode
     ? Object.values(bashChallenges).flatMap((l) => l.challenges).filter((c) => c.type === 'ai_error')
