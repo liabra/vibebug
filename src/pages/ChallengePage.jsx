@@ -168,7 +168,7 @@ export default function ChallengePage() {
           style={{
             ...styles.xpBadge,
             transform: xpFlash ? 'scale(1.25)' : 'scale(1)',
-            color: xpFlash ? '#16a34a' : '#2563eb',
+            color: xpFlash ? (isAiMode ? '#be123c' : '#16a34a') : '#2563eb',
           }}
         >
           ⚡ {xp} XP
@@ -183,13 +183,20 @@ export default function ChallengePage() {
           style={{
             ...styles.progressFill,
             width: `${((currentIndex + 1) / challenges.length) * 100}%`,
+            background: isAiMode ? '#be123c' : '#2563eb',
           }}
         />
       </div>
 
       {isAiMode && (
-        <div style={styles.aiModeBanner}>
-          Repère ce qui semble crédible mais ne l'est pas — ces patterns sont souvent générés sans avertissement par les IA.
+        <div style={styles.aiModeIntro}>
+          <div style={styles.aiModeIntroHeader}>
+            <span>🤖</span>
+            <strong style={styles.aiModeIntroTitle}>Mode Piège IA</strong>
+          </div>
+          <p style={styles.aiModeIntroText}>
+            Quelque chose semble crédible… mais ne l'est pas. L'IA a l'air sûre d'elle — c'est exactement ça, le piège.
+          </p>
         </div>
       )}
 
@@ -204,11 +211,16 @@ export default function ChallengePage() {
         return (
           <>
             {mission && (
-              <div style={{ ...styles.missionBadge, color: mission.color, background: mission.bg }}>
+              <div style={{
+                ...styles.missionBadge,
+                color: mission.color,
+                background: mission.bg,
+                ...(isAiMode ? styles.missionBadgeAi : {}),
+              }}>
                 {mission.icon} {mission.label}
               </div>
             )}
-            {challenge.type === 'ai_error' && (
+            {challenge.type === 'ai_error' && !isAiMode && (
               <div style={styles.aiWarning}>
                 ⚠️ Ce code a été généré par une IA — analyse-le attentivement avant de répondre.
               </div>
@@ -249,8 +261,8 @@ export default function ChallengePage() {
       )}
 
       {isAnswered && (
-        <button onClick={handleNext} style={styles.btnNext}>
-          {isLast ? 'Voir les résultats' : 'Question suivante →'}
+        <button onClick={handleNext} style={{ ...styles.btnNext, ...(isAiMode ? styles.btnNextAi : {}) }}>
+          {isLast ? 'Voir les résultats' : isAiMode ? 'Piège suivant →' : 'Question suivante →'}
         </button>
       )}
     </div>
@@ -339,16 +351,42 @@ const styles = {
     color: '#be123c',
     fontWeight: '700',
   },
-  aiModeBanner: {
-    padding: '0.75rem 1rem',
+  aiModeIntro: {
+    padding: '1rem 1.25rem',
     background: '#fff1f2',
     border: '1px solid #fda4af',
     borderLeft: '4px solid #be123c',
-    borderRadius: '8px',
-    fontSize: '0.875rem',
+    borderRadius: '10px',
+    marginBottom: '1.5rem',
+  },
+  aiModeIntroHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    marginBottom: '0.375rem',
+  },
+  aiModeIntroTitle: {
+    fontSize: '0.8rem',
+    fontWeight: '700',
     color: '#9f1239',
+    textTransform: 'uppercase',
+    letterSpacing: '0.06em',
+  },
+  aiModeIntroText: {
+    margin: 0,
+    fontSize: '0.875rem',
+    color: '#be123c',
     lineHeight: '1.5',
-    marginBottom: '1.25rem',
+    fontStyle: 'italic',
+  },
+  missionBadgeAi: {
+    background: '#fecdd3',
+    border: '1px solid #fb7185',
+    padding: '0.4rem 1rem',
+    fontSize: '0.82rem',
+  },
+  btnNextAi: {
+    background: '#be123c',
   },
   sessionHint: {
     fontSize: '0.78rem',
