@@ -71,6 +71,11 @@ function SpeedGame({ onRestart }) {
       const next = currentIndex + 1
       if (next >= QUESTION_COUNT) {
         const sessionBonus = score === QUESTION_COUNT ? 30 : score >= 4 ? 10 : 0
+        // Sauvegarde le résultat speed — conserve le perfect si déjà obtenu
+        const prev = JSON.parse(localStorage.getItem('vibebug_speed') ?? 'null')
+        if (!prev?.perfect || score === QUESTION_COUNT) {
+          localStorage.setItem('vibebug_speed', JSON.stringify({ perfect: score === QUESTION_COUNT, score }))
+        }
         navigate('/results', {
           state: { score, xp: xp + sessionBonus, total: QUESTION_COUNT, levelTitle: 'Speed Debug', mode: 'speed', bonusXp: sessionBonus },
         })

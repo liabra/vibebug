@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { computeEarnedBadgeIds, getStoredBadgeIds, storeBadgeIds, badgesFromIds } from '../utils/badgeUtils'
 
 function getModeContent(mode, score, total, xp, levelTitle, percentage, navigate) {
   if (mode === 'ai') {
@@ -73,6 +75,14 @@ export default function ResultsPage() {
   const content = getModeContent(mode, score, total, xp, levelTitle, percentage, navigate)
   const { badge } = content
 
+  // Détecte les badges nouvellement débloqués lors de cette session
+  const [newBadges] = useState(() => {
+    const earnedNow = computeEarnedBadgeIds()
+    const earnedBefore = getStoredBadgeIds()
+    return badgesFromIds(earnedNow.filter((id) => !earnedBefore.includes(id)))
+  })
+  useEffect(() => { storeBadgeIds(computeEarnedBadgeIds()) }, [])
+
   return (
     <div style={styles.container}>
       <h1 style={styles.heading}>{content.heading}</h1>
@@ -92,6 +102,23 @@ export default function ResultsPage() {
       </div>
 
       {content.flavor && <p style={styles.flavor}>{content.flavor}</p>}
+
+      {newBadges.length > 0 && (
+        <div style={styles.newBadgeSection}>
+          <p style={styles.newBadgeHeading}>
+            🎉 Badge{newBadges.length > 1 ? 's' : ''} débloqué{newBadges.length > 1 ? 's' : ''} !
+          </p>
+          {newBadges.map((b) => (
+            <div key={b.id} style={{ ...styles.newBadgeCard, background: b.bg, borderColor: b.border, color: b.color }}>
+              <span style={styles.newBadgeIcon}>{b.icon}</span>
+              <div>
+                <div style={styles.newBadgeLabel}>{b.label}</div>
+                <div style={styles.newBadgeDesc}>{b.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {mode === 'speed' && bonusXp > 0 && (
         <p style={styles.bonusLine}>
@@ -167,6 +194,39 @@ const styles = {
     fontWeight: '700',
     color: '#d97706',
     marginBottom: '1.5rem',
+  },
+  newBadgeSection: {
+    marginBottom: '1.5rem',
+  },
+  newBadgeHeading: {
+    fontSize: '0.85rem',
+    fontWeight: '700',
+    color: '#374151',
+    marginBottom: '0.625rem',
+  },
+  newBadgeCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+    padding: '0.75rem 1.1rem',
+    border: '2px solid',
+    borderRadius: '12px',
+    marginBottom: '0.5rem',
+    textAlign: 'left',
+  },
+  newBadgeIcon: {
+    fontSize: '1.75rem',
+    lineHeight: 1,
+    flexShrink: 0,
+  },
+  newBadgeLabel: {
+    fontWeight: '700',
+    fontSize: '0.95rem',
+  },
+  newBadgeDesc: {
+    fontSize: '0.78rem',
+    opacity: 0.8,
+    marginTop: '0.1rem',
   },
   badge: {
     display: 'inline-flex',

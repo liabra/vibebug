@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
 import { getSaved, getLevelStatus, getBadge, getTotalXp, getCompletedCount, getGlobalStats, getUsername, setUsername } from '../utils/progressUtils'
+import { computeEarnedBadgeIds, badgesFromIds } from '../utils/badgeUtils'
 
 const STATUS_META = {
   locked:    { label: 'Verrouillé', color: '#9ca3af', bg: '#f3f4f6', border: '#d1d5db' },
@@ -33,6 +34,7 @@ export default function ProfilePage() {
   const completedCount = getCompletedCount(levelEntries)
   const globalPct      = Math.round((completedCount / total) * 100)
   const badges         = levels.map(l => l.badge).filter(Boolean)
+  const specialBadges  = badgesFromIds(computeEarnedBadgeIds())
   const stats          = getGlobalStats(levelEntries)
 
   return (
@@ -95,7 +97,7 @@ export default function ProfilePage() {
           <span style={styles.statLabel}>Niveaux terminés</span>
         </div>
         <div style={styles.statBox}>
-          <span style={styles.statValue}>{badges.length}</span>
+          <span style={styles.statValue}>{badges.length + specialBadges.length}</span>
           <span style={styles.statLabel}>Badges obtenus</span>
         </div>
       </div>
@@ -181,17 +183,40 @@ export default function ProfilePage() {
       {/* Badges */}
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>Badges</h2>
-        {badges.length === 0 ? (
+        {badges.length === 0 && specialBadges.length === 0 ? (
           <p style={styles.empty}>Aucun badge pour l'instant. Termine un niveau pour en obtenir un !</p>
         ) : (
-          <div style={styles.badgesRow}>
-            {badges.map((b, i) => (
-              <div key={i} style={{ ...styles.badgeCard, background: b.bg, borderColor: b.border, color: b.color }}>
-                <span style={styles.badgeIcon}>{b.icon}</span>
-                <span style={styles.badgeLabel}>{b.label}</span>
-              </div>
-            ))}
-          </div>
+          <>
+            {badges.length > 0 && (
+              <>
+                <p style={styles.badgeGroupLabel}>Progression</p>
+                <div style={styles.badgesRow}>
+                  {badges.map((b, i) => (
+                    <div key={i} style={{ ...styles.badgeCard, background: b.bg, borderColor: b.border, color: b.color }}>
+                      <span style={styles.badgeIcon}>{b.icon}</span>
+                      <span style={styles.badgeLabel}>{b.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            {specialBadges.length > 0 && (
+              <>
+                <p style={{ ...styles.badgeGroupLabel, marginTop: badges.length > 0 ? '1.25rem' : 0 }}>Compétences</p>
+                <div style={styles.badgesRow}>
+                  {specialBadges.map((b) => (
+                    <div key={b.id} style={{ ...styles.badgeCard, background: b.bg, borderColor: b.border, color: b.color }}>
+                      <span style={styles.badgeIcon}>{b.icon}</span>
+                      <div>
+                        <div style={styles.badgeLabel}>{b.label}</div>
+                        <div style={styles.badgeDesc}>{b.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
         )}
       </div>
 
@@ -450,6 +475,14 @@ const styles = {
     gap: '0.875rem',
     flexWrap: 'wrap',
   },
+  badgeGroupLabel: {
+    fontSize: '0.72rem',
+    fontWeight: '700',
+    color: '#9ca3af',
+    textTransform: 'uppercase',
+    letterSpacing: '0.06em',
+    marginBottom: '0.625rem',
+  },
   badgeCard: {
     display: 'flex',
     alignItems: 'center',
@@ -465,6 +498,12 @@ const styles = {
   },
   badgeLabel: {
     fontSize: '0.875rem',
+  },
+  badgeDesc: {
+    fontSize: '0.72rem',
+    fontWeight: '500',
+    opacity: 0.75,
+    marginTop: '0.1rem',
   },
   empty: {
     fontSize: '0.875rem',
