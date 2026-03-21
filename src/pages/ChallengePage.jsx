@@ -88,7 +88,7 @@ export default function ChallengePage() {
     setSelectedAnswer(index)
     if (correct) {
       setScore((s) => s + 1)
-      setXp((x) => x + 10)
+      setXp((x) => x + (isAiMode ? 15 : 10))
       setXpFlash(true)
     }
   }
@@ -269,7 +269,7 @@ export default function ChallengePage() {
 
       {isAnswered && (
         <div style={isCorrect ? styles.feedbackCorrect : styles.feedbackIncorrect}>
-          <strong>{isCorrect ? '✓ Correct !' : '✗ Incorrect'}</strong>
+          <strong>{isCorrect ? `✓ Correct ! +${isAiMode ? 15 : 10} XP` : '✗ Incorrect'}</strong>
           <p style={styles.explanation}>{challenge.explanation}</p>
         </div>
       )}

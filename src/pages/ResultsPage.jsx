@@ -67,6 +67,7 @@ export default function ResultsPage() {
   const total = state?.total ?? 0
   const levelTitle = state?.levelTitle ?? ''
   const mode = state?.mode ?? 'standard'
+  const bonusXp = state?.bonusXp ?? 0
   const percentage = total > 0 ? Math.round((score / total) * 100) : 0
 
   const content = getModeContent(mode, score, total, xp, levelTitle, percentage, navigate)
@@ -91,6 +92,12 @@ export default function ResultsPage() {
       </div>
 
       {content.flavor && <p style={styles.flavor}>{content.flavor}</p>}
+
+      {mode === 'speed' && bonusXp > 0 && (
+        <p style={styles.bonusLine}>
+          {bonusXp === 30 ? '🏆 Session parfaite' : '👍 Bonne session'} · +{bonusXp} XP bonus
+        </p>
+      )}
 
       <div style={styles.actions}>
         {content.actions}
@@ -154,6 +161,12 @@ const styles = {
     fontStyle: 'italic',
     marginBottom: '1.5rem',
     marginTop: '-1rem',
+  },
+  bonusLine: {
+    fontSize: '0.95rem',
+    fontWeight: '700',
+    color: '#d97706',
+    marginBottom: '1.5rem',
   },
   badge: {
     display: 'inline-flex',
