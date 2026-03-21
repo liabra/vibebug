@@ -102,6 +102,7 @@ export default function ChallengePage() {
           xp,
           total: challenges.length,
           levelTitle,
+          mode: isAiMode ? 'ai' : 'standard',
         },
       })
       return

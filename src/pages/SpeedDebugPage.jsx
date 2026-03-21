@@ -70,7 +70,9 @@ function SpeedGame({ onRestart }) {
     const t = setTimeout(() => {
       const next = currentIndex + 1
       if (next >= QUESTION_COUNT) {
-        setGameOver(true)
+        navigate('/results', {
+          state: { score, xp, total: QUESTION_COUNT, levelTitle: 'Speed Debug', mode: 'speed' },
+        })
       } else {
         setCurrentIndex(next)
         setSelectedAnswer(null)
