@@ -210,4 +210,110 @@ export const automationChallenges = {
       },
     ],
   },
+
+  auto_3: {
+    title: 'Scénarios réels',
+    challenges: [
+      // ── Scénario A : Site hors-ligne ──────────────────────────────────────
+      {
+        id: 1,
+        type: 'fix',
+        scenarioId: 'service-down',
+        scenarioTitle: 'Site hors-ligne — 23h',
+        scenarioContext:
+          "Il est 23h. Une alerte arrive : ton site e-commerce est injoignable. Tu te connectes en SSH au serveur de production. nginx et l'app Node.js tournent normalement d'habitude.",
+        title: 'Étape 1 — Premier diagnostic',
+        prompt: 'Quelle est ta première action ?',
+        options: [
+          '`reboot` — relancer le serveur règle la plupart des problèmes',
+          '`systemctl status nginx` — vérifier l\'état du serveur web sans rien modifier',
+          '`ping google.com` — vérifier la connectivité réseau',
+          '`rm -rf /var/log/nginx/*.log` — vider les logs pour voir les nouvelles erreurs',
+        ],
+        correctAnswer: 1,
+        explanation:
+          "La première étape du diagnostic est de vérifier l'état du service sans rien modifier. `systemctl status` donne l'état, les erreurs récentes et le PID. Rebooter en premier est une mauvaise pratique : ça efface les preuves et peut aggraver la situation.",
+      },
+      {
+        id: 2,
+        type: 'find_error',
+        scenarioId: 'service-down',
+        scenarioTitle: 'Site hors-ligne — 23h',
+        scenarioContext:
+          "nginx est actif (`active (running)`), mais le site répond 502 Bad Gateway. Tu consultes les logs d'erreur nginx.",
+        title: 'Étape 2 — Interpréter le log',
+        prompt: 'Que signifie cette ligne de log ?',
+        code: '[error] connect() failed (111: Connection refused) while\nconnecting to upstream: "http://127.0.0.1:3000"',
+        options: [
+          'Le port 80 est bloqué par le pare-feu',
+          'nginx a une erreur dans son fichier de configuration',
+          "L'application backend sur le port 3000 ne répond plus — nginx ne peut pas lui relayer les requêtes",
+          "La base de données n'est pas accessible",
+        ],
+        correctAnswer: 2,
+        explanation:
+          "`Connection refused` sur le port 3000 (upstream) signifie que le processus applicatif n'écoute plus sur ce port. nginx fonctionne correctement — c'est l'app derrière qui est tombée. La prochaine étape : `pm2 logs` ou `pm2 status` pour comprendre pourquoi.",
+      },
+      {
+        id: 3,
+        type: 'ai_error',
+        scenarioId: 'service-down',
+        scenarioTitle: 'Site hors-ligne — 23h',
+        scenarioContext:
+          "L'app Node.js sur le port 3000 ne répond plus. L'IA propose une commande pour régler le problème rapidement.",
+        title: 'Étape 3 — La suggestion de l\'IA',
+        prompt: "L'IA propose cette commande pour remettre le site en ligne. Qu'est-ce qui cloche ?",
+        code: 'pm2 restart all',
+        options: [
+          "`pm2` ne peut pas redémarrer des applications Node.js",
+          "Redémarrer sans lire les logs masque la cause — si l'app crashe à cause d'un bug, elle sera de nouveau hors-ligne en quelques secondes",
+          "Il faut d'abord faire `pm2 stop all` avant `pm2 restart`",
+          "La commande est correcte et c'est la bonne première action",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "`pm2 logs app --lines 50` doit précéder le redémarrage. Si l'app plante à cause d'une exception non gérée, un accès DB impossible ou une mémoire saturée, redémarrer sans lire les logs conduit à une boucle de crashes. Diagnostiquer d'abord, corriger ensuite.",
+      },
+
+      // ── Scénario B : Accès refusé ──────────────────────────────────────────
+      {
+        id: 4,
+        type: 'explain',
+        scenarioId: 'perm-denied',
+        scenarioTitle: 'Accès refusé',
+        scenarioContext:
+          "Ton script de déploiement s'arrête avec `bash: /var/app/uploads: Permission denied`. Le dossier existe bien sur le serveur. Tu dois y écrire.",
+        title: 'Étape 1 — Lire les permissions',
+        prompt: 'Quelle commande donne les informations nécessaires pour comprendre ce refus ?',
+        options: [
+          '`cat /var/app/uploads` — lire le contenu du dossier',
+          '`file /var/app/uploads` — identifier le type de fichier',
+          '`ls -la /var/app/` — afficher permissions, propriétaire et groupe du dossier',
+          '`chmod status /var/app/uploads` — voir les permissions actuelles',
+        ],
+        correctAnswer: 2,
+        explanation:
+          "`ls -la` affiche les permissions sous la forme `drwxr-xr-x`, le propriétaire et le groupe. C'est le point de départ standard pour tout diagnostic d'accès refusé. `chmod status` n'est pas une vraie commande.",
+      },
+      {
+        id: 5,
+        type: 'ai_error',
+        scenarioId: 'perm-denied',
+        scenarioTitle: 'Accès refusé',
+        scenarioContext:
+          "Le résultat de `ls -la` : `drwxr-xr-x 2 root root uploads/`. Ton script tourne sous l'utilisateur `deploy`. L'IA propose une correction.",
+        title: "Étape 2 — La correction de l'IA",
+        prompt: "L'IA propose `chmod -R 777 /var/app/uploads`. Quelle est la vraie solution ?",
+        options: [
+          '`chmod -R 777` est adapté pour un dossier d\'uploads accessible à l\'app',
+          '`chown -R deploy:deploy /var/app/uploads` — transférer la propriété à l\'utilisateur deploy sans ouvrir les permissions à tout le monde',
+          '`chmod 755 /var/app/uploads` — ajouter le droit d\'exécution au propriétaire',
+          "Relancer le script avec `sudo` — c'est plus simple",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "Le problème est la propriété, pas les permissions. Le dossier appartient à `root`, donc `deploy` ne peut qu'y lire. `chown` transfère la propriété. `chmod 777` est une faille : n'importe quel utilisateur du serveur peut modifier les uploads. `sudo` masque le problème sans le résoudre.",
+      },
+    ],
+  },
 }

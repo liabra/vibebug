@@ -209,6 +209,16 @@ export default function ChallengePage() {
         </p>
       )}
 
+      {challenge.scenarioContext && (
+        <div style={styles.scenarioBlock}>
+          <div style={styles.scenarioHeader}>
+            <span style={styles.scenarioIcon}>🎯</span>
+            <span style={styles.scenarioTitle}>{challenge.scenarioTitle}</span>
+          </div>
+          <p style={styles.scenarioContext}>{challenge.scenarioContext}</p>
+        </div>
+      )}
+
       {(() => {
         const mission = MISSION_META[challenge.type]
         return (
@@ -390,6 +400,35 @@ const styles = {
   },
   btnNextAi: {
     background: '#be123c',
+  },
+  scenarioBlock: {
+    background: '#0f172a',
+    borderRadius: '10px',
+    padding: '1rem 1.25rem',
+    marginBottom: '1.25rem',
+    borderLeft: '3px solid #3b82f6',
+  },
+  scenarioHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    marginBottom: '0.5rem',
+  },
+  scenarioIcon: {
+    fontSize: '0.9rem',
+  },
+  scenarioTitle: {
+    fontSize: '0.72rem',
+    fontWeight: '700',
+    color: '#60a5fa',
+    textTransform: 'uppercase',
+    letterSpacing: '0.07em',
+  },
+  scenarioContext: {
+    margin: 0,
+    fontSize: '0.9rem',
+    color: '#cbd5e1',
+    lineHeight: '1.6',
   },
   sessionHint: {
     fontSize: '0.78rem',
