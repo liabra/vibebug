@@ -202,6 +202,54 @@ export const bashChallenges = {
         explanation:
           "`>` redirige en mode écrasement. Pour accumuler les entrées sans perdre l'historique, il faut `>>` (append). Erreur classique dans les scripts de log générés par IA.",
       },
+      {
+        id: 8,
+        type: "ai_error",
+        title: "La redirection sudo",
+        prompt: "L'IA te propose cette commande pour activer le routage réseau sur le serveur. Qu'est-ce qui cloche ?",
+        code: 'sudo echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf',
+        options: [
+          "`sudo` ne peut pas être combiné avec `echo`",
+          "La redirection `>>` est interprétée par ton shell (sans privilèges), pas par `sudo` — la commande échouera si tu n'es pas root",
+          "`/etc/sysctl.conf` n'est pas le bon fichier pour ce paramètre",
+          "La commande est correcte et fonctionnera sans problème",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "`sudo` élève les droits d'`echo` uniquement. Le `>>` est géré par ton shell courant, qui n'a pas accès au fichier. La commande échoue silencieusement. Fix : `echo \"...\" | sudo tee -a /etc/sysctl.conf`",
+      },
+      {
+        id: 9,
+        type: "ai_error",
+        title: "Boucle sur fichiers",
+        prompt: "L'IA génère cette boucle pour exécuter tous les scripts du dossier. Quel est le problème ?",
+        code: "for f in $(ls *.sh); do\n  bash \"$f\"\ndone",
+        options: [
+          "`bash \"$f\"` devrait être `./$f` sans guillemets",
+          "`$(ls *.sh)` découpe la sortie sur les espaces — un fichier nommé `mon script.sh` devient deux éléments distincts",
+          "La boucle ne peut pas utiliser `bash` pour exécuter les scripts",
+          "`do` doit obligatoirement être sur la même ligne que `for`",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "`$(ls *.sh)` soumet la liste à la découpe par mots (word splitting). Un fichier `deploy prod.sh` devient `deploy` et `prod.sh`. L'IA génère ce pattern très souvent. Fix : `for f in *.sh` — le glob bash gère les espaces correctement.",
+      },
+      {
+        id: 10,
+        type: "ai_error",
+        title: "Permissions larges",
+        prompt: "Ton site web retourne des erreurs 403. L'IA suggère cette commande pour \"corriger les permissions d'un coup\". Qu'est-ce qui cloche ?",
+        code: "chmod -R 777 /var/www/html",
+        options: [
+          "`chmod -R` ne fonctionne pas sur les répertoires imbriqués",
+          "`777` donne la lecture, l'écriture et l'exécution à tous les utilisateurs du système — faille de sécurité majeure sur un serveur",
+          "Il faut utiliser `chown` plutôt que `chmod` ici",
+          "La commande est correcte pour un serveur de développement",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "`777` (rwxrwxrwx) permet à n'importe quel utilisateur de modifier ou d'exécuter les fichiers. Sur un serveur, c'est une ouverture critique. Les permissions usuelles : `644` pour les fichiers, `755` pour les dossiers, propriétaire = utilisateur du serveur web.",
+      },
     ],
   },
   3: {
@@ -312,6 +360,54 @@ export const bashChallenges = {
         correctAnswer: 1,
         explanation:
           "`curl -I` envoie une requête HEAD et affiche immédiatement le code HTTP (200, 502, connexion refusée…). `ping` ne teste que la connectivité réseau, pas le service. Les logs viennent après pour approfondir.",
+      },
+      {
+        id: 8,
+        type: "ai_error",
+        title: "Nettoyage de cache",
+        prompt: "Avant chaque déploiement, l'IA génère ce one-liner pour vider un répertoire de cache. Le dossier n'existe pas toujours. Quel est le risque ?",
+        code: "cd /tmp/deploy_cache; rm -rf *",
+        options: [
+          "`rm -rf *` ne supprime pas les fichiers cachés commençant par `.`",
+          "Si `cd` échoue (répertoire absent), `;` laisse `rm -rf *` s'exécuter dans le répertoire courant",
+          "La commande est sûre car `/tmp` est protégé en écriture",
+          "`cd` et `rm` ne peuvent pas être chaînés sur la même ligne",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "`;` exécute la commande suivante quel que soit le résultat de la précédente. Si `/tmp/deploy_cache` n'existe pas, `rm -rf *` efface le répertoire courant. Fix : utiliser `&&` à la place de `;`, ou mieux : `rm -rf /tmp/deploy_cache/*` directement.",
+      },
+      {
+        id: 9,
+        type: "ai_error",
+        title: "Capture des erreurs",
+        prompt: "L'IA génère cette commande pour capturer toute la sortie d'un script (stdout + stderr) dans un fichier log. Qu'est-ce qui ne fonctionne pas comme prévu ?",
+        code: "python3 deploy.py 2>&1 > deploy.log",
+        options: [
+          "Python3 n'est pas compatible avec cette syntaxe de redirection",
+          "L'ordre est inversé : `2>&1` redirige stderr vers stdout (le terminal à cet instant), puis `>` redirige stdout vers le fichier — les erreurs s'affichent à l'écran et ne sont pas loggées",
+          "Il faut `>>` pour créer un fichier log, pas `>`",
+          "La commande est correcte et capture bien stdout et stderr",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "L'ordre des redirections compte. Avec `2>&1 > fichier` : stderr est d'abord redirigé vers stdout (qui est encore le terminal), puis stdout vers le fichier. Résultat : les erreurs restent à l'écran. La forme correcte est `> fichier 2>&1`.",
+      },
+      {
+        id: 10,
+        type: "ai_error",
+        title: "Variable invisible",
+        prompt: "L'IA configure les variables de connexion puis lance le script. Dans `connect.sh`, `$DB_HOST` est vide. Pourquoi ?",
+        code: "DB_HOST=localhost\nDB_PORT=5432\nbash connect.sh",
+        options: [
+          "Les variables doivent être définies dans un fichier `.env` pour être lisibles",
+          "Sans `export`, les variables sont locales au shell courant et invisibles dans les sous-processus comme `bash connect.sh`",
+          "`DB_HOST` est un nom de variable réservé par le système",
+          "Il faut utiliser `source connect.sh` pour que les variables soient transmises",
+        ],
+        correctAnswer: 1,
+        explanation:
+          "Une variable sans `export` ne passe pas dans l'environnement des processus enfants. `bash connect.sh` démarre un nouveau shell qui ne voit pas ces variables. Fix : `export DB_HOST=localhost` ou passage inline : `DB_HOST=localhost DB_PORT=5432 bash connect.sh`.",
       },
     ],
   },
