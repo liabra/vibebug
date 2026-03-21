@@ -53,16 +53,30 @@ export default function LevelsPage() {
         <span style={styles.separatorLine} />
       </div>
 
-      <div style={styles.trapCard}>
-        <div style={styles.trapLeft}>
-          <span style={styles.trapTitle}>🤖 Piège IA</span>
-          <span style={styles.trapDesc}>
-            Repère ce que l'IA te ferait croire — des patterns plausibles mais incorrects, tirés de toutes les missions.
-          </span>
+      <div style={styles.specialCards}>
+        <div style={styles.trapCard}>
+          <div style={styles.trapLeft}>
+            <span style={styles.trapTitle}>🤖 Piège IA</span>
+            <span style={styles.trapDesc}>
+              Repère ce que l'IA te ferait croire — des patterns plausibles mais incorrects.
+            </span>
+          </div>
+          <button onClick={handleStartTrap} style={styles.trapBtn}>
+            {getSaved('ai')?.completed ? 'Rejouer' : 'Lancer'}
+          </button>
         </div>
-        <button onClick={handleStartTrap} style={styles.trapBtn}>
-          {getSaved('ai')?.completed ? 'Rejouer' : 'Lancer'}
-        </button>
+
+        <div style={styles.speedCard}>
+          <div style={styles.trapLeft}>
+            <span style={styles.speedTitle}>⚡ Speed Debug</span>
+            <span style={styles.speedDesc}>
+              5 missions · 15 secondes chacune — entraîne tes réflexes de diagnostic.
+            </span>
+          </div>
+          <button onClick={() => navigate('/speed')} style={styles.speedBtn}>
+            Lancer
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -107,6 +121,11 @@ const styles = {
     letterSpacing: '0.06em',
     whiteSpace: 'nowrap',
   },
+  specialCards: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+  },
   trapCard: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -136,6 +155,38 @@ const styles = {
     flexShrink: 0,
     padding: '0.6rem 1.25rem',
     background: '#be123c',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '0.9rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  speedCard: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '1.25rem 1.5rem',
+    background: '#fffbeb',
+    border: '1.5px solid #fcd34d',
+    borderRadius: '14px',
+    gap: '1rem',
+  },
+  speedTitle: {
+    fontWeight: '700',
+    fontSize: '1rem',
+    color: '#92400e',
+  },
+  speedDesc: {
+    fontSize: '0.82rem',
+    color: '#b45309',
+    lineHeight: '1.4',
+  },
+  speedBtn: {
+    flexShrink: 0,
+    padding: '0.6rem 1.25rem',
+    background: '#d97706',
     color: '#fff',
     border: 'none',
     borderRadius: '8px',

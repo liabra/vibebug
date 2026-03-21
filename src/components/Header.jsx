@@ -11,7 +11,7 @@ export default function Header() {
   const navigate = useNavigate()
 
   // Pages immersives : pas de header
-  if (location.pathname.startsWith('/challenge') || location.pathname === '/results') {
+  if (location.pathname.startsWith('/challenge') || location.pathname === '/results' || location.pathname === '/speed') {
     return null
   }
 
