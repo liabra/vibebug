@@ -77,6 +77,18 @@ export default function LevelsPage() {
             Lancer
           </button>
         </div>
+
+        <div style={styles.reconstructCard}>
+          <div style={styles.trapLeft}>
+            <span style={styles.reconstructTitle}>🔧 Reconstruct Script</span>
+            <span style={styles.reconstructDesc}>
+              5 défis · remets les blocs dans le bon ordre — entraîne ta logique d'exécution.
+            </span>
+          </div>
+          <button onClick={() => navigate('/reconstruct')} style={styles.reconstructBtn}>
+            Lancer
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -187,6 +199,38 @@ const styles = {
     flexShrink: 0,
     padding: '0.6rem 1.25rem',
     background: '#d97706',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '0.9rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  reconstructCard: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '1.25rem 1.5rem',
+    background: '#f5f3ff',
+    border: '1.5px solid #c4b5fd',
+    borderRadius: '14px',
+    gap: '1rem',
+  },
+  reconstructTitle: {
+    fontWeight: '700',
+    fontSize: '1rem',
+    color: '#4c1d95',
+  },
+  reconstructDesc: {
+    fontSize: '0.82rem',
+    color: '#6d28d9',
+    lineHeight: '1.4',
+  },
+  reconstructBtn: {
+    flexShrink: 0,
+    padding: '0.6rem 1.25rem',
+    background: '#7c3aed',
     color: '#fff',
     border: 'none',
     borderRadius: '8px',

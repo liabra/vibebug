@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import ModesPage from './pages/ModesPage'
+import ReconstructPage from './pages/ReconstructPage'
 import LevelsPage from './pages/LevelsPage'
 import AutoLevelsPage from './pages/AutoLevelsPage'
 import SpeedDebugPage from './pages/SpeedDebugPage'
@@ -22,6 +23,7 @@ function App() {
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/speed" element={<SpeedDebugPage />} />
+        <Route path="/reconstruct" element={<ReconstructPage />} />
       </Routes>
     </BrowserRouter>
   )
