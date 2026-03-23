@@ -49,7 +49,11 @@ function getModeContent(mode, score, total, xp, levelTitle, percentage, navigate
   return {
     heading: 'Mission accomplie !',
     subtitle: levelTitle,
-    flavor: null,
+    flavor: percentage === 100
+      ? 'Parfait. Chaque bug compris, c\'est une heure de debug économisée.'
+      : percentage >= 60
+      ? 'Bon travail — continue à affiner tes réflexes.'
+      : 'Les ratés d\'aujourd\'hui forgent les réflexes de demain.',
     badge,
     actions: (
       <>

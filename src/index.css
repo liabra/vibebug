@@ -54,6 +54,41 @@ body {
   margin: 0;
 }
 
+/* ── Correction : <code> dans <pre> et <button> ne doit pas hériter du style global ── */
+pre code,
+button code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  display: inline;
+}
+
+/* ── Micro-interactions : hover / active sur tous les boutons ── */
+button:not(:disabled):hover {
+  filter: brightness(1.07);
+  transition: filter 0.12s ease;
+}
+
+button:not(:disabled):active {
+  transform: scale(0.97);
+  transition: transform 0.06s ease;
+}
+
+button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}
+
+/* ── Cibles tactiles minimum sur mobile ── */
+@media (max-width: 640px) {
+  button {
+    min-height: 44px;
+  }
+}
+
 #root {
   width: 1126px;
   max-width: 100%;

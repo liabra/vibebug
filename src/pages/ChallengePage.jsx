@@ -269,14 +269,14 @@ export default function ChallengePage() {
 
       {isAnswered && (
         <div style={isCorrect ? styles.feedbackCorrect : styles.feedbackIncorrect}>
-          <strong>{isCorrect ? `✓ Correct ! +${isAiMode ? 15 : 10} XP` : '✗ Incorrect'}</strong>
+          <strong>{isCorrect ? `✓ Correct ! +${isAiMode ? 15 : 10} XP` : '✗ Raté'}</strong>
           <p style={styles.explanation}>{challenge.explanation}</p>
         </div>
       )}
 
       {isAnswered && (
         <button onClick={handleNext} style={{ ...styles.btnNext, ...(isAiMode ? styles.btnNextAi : {}) }}>
-          {isLast ? 'Voir les résultats' : isAiMode ? 'Piège suivant →' : 'Question suivante →'}
+          {isLast ? 'Voir les résultats' : isAiMode ? 'Piège suivant →' : 'Défi suivant →'}
         </button>
       )}
     </div>
