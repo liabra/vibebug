@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { formations, LEVELS, CATEGORIES, CHAPTER_TYPES } from '../data/formations'
+import { useWindowSize } from '../utils/useWindowSize'
 
 function loadCompletedChapters(id) {
   try { return JSON.parse(localStorage.getItem(`vibebug_formation_${id}_chapters`)) ?? [] } catch { return [] }
@@ -13,9 +14,11 @@ function saveCompletedChapters(id, completedIds, totalChapters) {
 }
 
 export default function FormationDetailPage() {
-  const { id }     = useParams()
-  const navigate   = useNavigate()
+  const { id }      = useParams()
+  const navigate    = useNavigate()
   const chaptersRef = useRef(null)
+  const width       = useWindowSize()
+  const isMobile    = width < 768
 
   const formation = formations.find(f => f.id === id)
 
@@ -95,14 +98,23 @@ export default function FormationDetailPage() {
         )}
 
         {/* Action buttons */}
-        <div style={styles.actions}>
-          <button onClick={handleCommencer} style={{ ...styles.btnPrimary, background: lvl.color }}>
+        <div style={{ ...styles.actions, flexDirection: isMobile ? 'column' : 'row' }}>
+          <button
+            onClick={handleCommencer}
+            style={{ ...styles.btnPrimary, background: lvl.color, ...(isMobile ? styles.btnFull : {}) }}
+          >
             {commencerLabel}
           </button>
-          <button onClick={() => navigate(`/formations/${id}/quiz`)} style={styles.btnQuiz}>
+          <button
+            onClick={() => navigate(`/formations/${id}/quiz`)}
+            style={{ ...styles.btnQuiz, ...(isMobile ? styles.btnFull : {}) }}
+          >
             ✏️ Quiz noté /20
           </button>
-          <button onClick={() => navigate('/levels')} style={styles.btnGame}>
+          <button
+            onClick={() => navigate('/levels')}
+            style={{ ...styles.btnGame, ...(isMobile ? styles.btnFull : {}) }}
+          >
             🎮 Mode jeu
           </button>
         </div>
@@ -141,8 +153,11 @@ export default function FormationDetailPage() {
       </div>
 
       {/* Bottom actions */}
-      <div style={styles.bottomActions}>
-        <button onClick={() => navigate(`/formations/${id}/quiz`)} style={{ ...styles.btnPrimary, background: lvl.color }}>
+      <div style={{ ...styles.bottomActions, flexDirection: isMobile ? 'column' : 'row' }}>
+        <button
+          onClick={() => navigate(`/formations/${id}/quiz`)}
+          style={{ ...styles.btnPrimary, background: lvl.color, ...(isMobile ? styles.btnFull : {}) }}
+        >
           Passer le quiz noté /20 →
         </button>
         <button onClick={() => navigate('/formations')} style={styles.btnNav}>
@@ -399,5 +414,10 @@ const styles = {
     alignItems: 'center',
     paddingTop: '1rem',
     borderTop: '1px solid #e5e7eb',
+  },
+  btnFull: {
+    width: '100%',
+    textAlign: 'center',
+    justifyContent: 'center',
   },
 }

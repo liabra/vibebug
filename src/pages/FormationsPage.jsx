@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { formations, LEVELS, CATEGORIES } from '../data/formations'
+import { useWindowSize } from '../utils/useWindowSize'
 
 function getProgress(id) {
   try { return JSON.parse(localStorage.getItem(`vibebug_formation_${id}_progress`)) ?? 0 } catch { return 0 }
@@ -11,9 +12,14 @@ function getQuizScore(id) {
 }
 
 export default function FormationsPage() {
-  const navigate = useNavigate()
+  const navigate      = useNavigate()
+  const width         = useWindowSize()
+  const isMobile      = width < 768
+  const isTablet      = width >= 768 && width < 1024
+
   const [activeCategory, setActiveCategory] = useState(null)
-  const [activeLevel, setActiveLevel]       = useState(null)
+  const [activeLevel,    setActiveLevel]    = useState(null)
+  const [sidebarOpen,    setSidebarOpen]    = useState(false)
 
   const filtered = formations.filter(f => {
     if (activeCategory && f.category !== activeCategory) return false
@@ -21,41 +27,112 @@ export default function FormationsPage() {
     return true
   })
 
+  function selectCategory(id) {
+    setActiveCategory(prev => prev === id ? null : id)
+    setSidebarOpen(false)
+  }
+
+  const gridCols = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(256px, 1fr))'
+
   return (
     <div style={styles.page}>
+
+      {/* ── Overlay sidebar (mobile) ── */}
+      {isMobile && sidebarOpen && (
+        <>
+          <div style={styles.backdrop} onClick={() => setSidebarOpen(false)} />
+          <div style={styles.drawer}>
+            <div style={styles.drawerHeader}>
+              <span style={styles.drawerTitle}>Catégorie</span>
+              <button onClick={() => setSidebarOpen(false)} style={styles.closeBtn}>✕</button>
+            </div>
+            <button
+              onClick={() => selectCategory(null)}
+              style={{ ...styles.catBtn, ...(activeCategory === null ? styles.catBtnActive : {}) }}
+            >
+              Toutes les catégories
+            </button>
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => selectCategory(cat.id)}
+                style={{ ...styles.catBtn, ...(activeCategory === cat.id ? styles.catBtnActive : {}) }}
+              >
+                <span>{cat.icon}</span>
+                <span>{cat.label}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* ── Page header ── */}
       <div style={styles.pageHeader}>
-        <h1 style={styles.heading}>Formations</h1>
-        <p style={styles.subheading}>
-          Approfondis tes connaissances en Product Management, économie, organisation et philosophie.
-        </p>
+        <div style={styles.pageHeaderRow}>
+          {isMobile && (
+            <button onClick={() => setSidebarOpen(true)} style={styles.hamburger}>
+              ☰ Catégories{activeCategory ? ` · ${CATEGORIES.find(c => c.id === activeCategory)?.label}` : ''}
+            </button>
+          )}
+          <div>
+            <h1 style={styles.heading}>Formations</h1>
+            <p style={styles.subheading}>
+              Approfondis tes connaissances en Product Management, économie, organisation et philosophie.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div style={styles.layout}>
-
-        {/* ── Sidebar ── */}
-        <aside style={styles.sidebar}>
-          <p style={styles.sidebarLabel}>Catégorie</p>
+      {/* ── Mobile category tabs ── */}
+      {isMobile && (
+        <div style={styles.categoryTabs}>
           <button
             onClick={() => setActiveCategory(null)}
-            style={{ ...styles.catBtn, ...(activeCategory === null ? styles.catBtnActive : {}) }}
+            style={{ ...styles.tabBtn, ...(activeCategory === null ? styles.tabBtnActive : {}) }}
           >
             Toutes
           </button>
           {CATEGORIES.map(cat => (
             <button
               key={cat.id}
-              onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
-              style={{ ...styles.catBtn, ...(activeCategory === cat.id ? styles.catBtnActive : {}) }}
+              onClick={() => setActiveCategory(prev => prev === cat.id ? null : cat.id)}
+              style={{ ...styles.tabBtn, ...(activeCategory === cat.id ? styles.tabBtnActive : {}) }}
             >
-              <span>{cat.icon}</span>
-              <span>{cat.label}</span>
+              {cat.icon} {cat.label}
             </button>
           ))}
-        </aside>
+        </div>
+      )}
 
-        {/* ── Main ── */}
+      <div style={isMobile ? styles.layoutMobile : styles.layout}>
+
+        {/* ── Desktop sidebar ── */}
+        {!isMobile && (
+          <aside style={styles.sidebar}>
+            <p style={styles.sidebarLabel}>Catégorie</p>
+            <button
+              onClick={() => setActiveCategory(null)}
+              style={{ ...styles.catBtn, ...(activeCategory === null ? styles.catBtnActive : {}) }}
+            >
+              Toutes
+            </button>
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(prev => prev === cat.id ? null : cat.id)}
+                style={{ ...styles.catBtn, ...(activeCategory === cat.id ? styles.catBtnActive : {}) }}
+              >
+                <span>{cat.icon}</span>
+                <span>{cat.label}</span>
+              </button>
+            ))}
+          </aside>
+        )}
+
+        {/* ── Main content ── */}
         <main style={styles.main}>
-          {/* Level filters */}
+
+          {/* Level filter chips */}
           <div style={styles.levelFilters}>
             <button
               onClick={() => setActiveLevel(null)}
@@ -66,7 +143,7 @@ export default function FormationsPage() {
             {Object.entries(LEVELS).map(([key, lvl]) => (
               <button
                 key={key}
-                onClick={() => setActiveLevel(activeLevel === key ? null : key)}
+                onClick={() => setActiveLevel(prev => prev === key ? null : key)}
                 style={{
                   ...styles.chip,
                   ...(activeLevel === key
@@ -81,8 +158,8 @@ export default function FormationsPage() {
 
           <p style={styles.count}>{filtered.length} formation{filtered.length !== 1 ? 's' : ''}</p>
 
-          {/* Grid */}
-          <div style={styles.grid}>
+          {/* Cards */}
+          <div style={{ ...styles.grid, gridTemplateColumns: gridCols }}>
             {filtered.map(f => {
               const lvl       = LEVELS[f.level]
               const cat       = CATEGORIES.find(c => c.id === f.category)
@@ -147,7 +224,12 @@ const styles = {
     color: '#111827',
   },
   pageHeader: {
-    marginBottom: '2rem',
+    marginBottom: '1.5rem',
+  },
+  pageHeaderRow: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
   },
   heading: {
     fontSize: '1.75rem',
@@ -161,13 +243,113 @@ const styles = {
     lineHeight: 1.6,
     margin: 0,
   },
+
+  /* Hamburger (mobile) */
+  hamburger: {
+    alignSelf: 'flex-start',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.4rem',
+    padding: '0.5rem 0.875rem',
+    background: '#fff',
+    border: '1.5px solid #d1d5db',
+    borderRadius: '8px',
+    fontSize: '0.85rem',
+    fontWeight: '600',
+    color: '#374151',
+    cursor: 'pointer',
+    fontFamily: 'system-ui, sans-serif',
+    maxWidth: '100%',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+
+  /* Overlay backdrop + drawer */
+  backdrop: {
+    position: 'fixed',
+    top: 0, left: 0, right: 0, bottom: 0,
+    background: 'rgba(0,0,0,0.35)',
+    zIndex: 200,
+  },
+  drawer: {
+    position: 'fixed',
+    top: 0, left: 0, bottom: 0,
+    width: '260px',
+    background: '#fff',
+    zIndex: 201,
+    padding: '1.25rem 1rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.375rem',
+    overflowY: 'auto',
+    boxShadow: '4px 0 24px rgba(0,0,0,0.12)',
+  },
+  drawerHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: '0.625rem',
+  },
+  drawerTitle: {
+    fontSize: '0.68rem',
+    fontWeight: '800',
+    color: '#9ca3af',
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em',
+  },
+  closeBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '1rem',
+    color: '#6b7280',
+    cursor: 'pointer',
+    padding: '0.25rem',
+    fontFamily: 'system-ui, sans-serif',
+  },
+
+  /* Category tabs (mobile horizontal scroll) */
+  categoryTabs: {
+    display: 'flex',
+    gap: '0.375rem',
+    overflowX: 'auto',
+    paddingBottom: '0.75rem',
+    marginBottom: '0.25rem',
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none',
+  },
+  tabBtn: {
+    flexShrink: 0,
+    padding: '0.4rem 0.875rem',
+    background: '#f3f4f6',
+    border: '1px solid #e5e7eb',
+    borderRadius: '999px',
+    fontSize: '0.82rem',
+    color: '#374151',
+    cursor: 'pointer',
+    fontFamily: 'system-ui, sans-serif',
+    fontWeight: '500',
+    whiteSpace: 'nowrap',
+  },
+  tabBtnActive: {
+    background: '#eff6ff',
+    color: '#2563eb',
+    borderColor: '#bfdbfe',
+    fontWeight: '700',
+  },
+
+  /* Layout */
   layout: {
     display: 'flex',
     gap: '2rem',
     alignItems: 'flex-start',
   },
+  layoutMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
 
-  /* Sidebar */
+  /* Desktop sidebar */
   sidebar: {
     width: '196px',
     flexShrink: 0,
@@ -243,7 +425,6 @@ const styles = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(256px, 1fr))',
     gap: '1rem',
   },
 

@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useWindowSize } from '../utils/useWindowSize'
 
 const NAV_LINKS = [
   { label: 'Accueil',     path: '/'           },
@@ -11,26 +12,40 @@ const NAV_LINKS = [
 export default function Header() {
   const location = useLocation()
   const navigate = useNavigate()
+  const width    = useWindowSize()
+  const isMobile = width < 768
 
   // Pages immersives : pas de header
   if (location.pathname.startsWith('/challenge') || location.pathname === '/results' || location.pathname === '/speed' || location.pathname === '/reconstruct') {
     return null
   }
 
+  const innerStyle = isMobile
+    ? { ...styles.inner, height: 'auto', flexDirection: 'column', alignItems: 'flex-start', paddingTop: '0.5rem', paddingBottom: '0.375rem', gap: '0.25rem' }
+    : styles.inner
+
+  const navStyle = isMobile
+    ? { ...styles.nav, overflowX: 'auto', width: '100%', paddingBottom: '0.25rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }
+    : styles.nav
+
+  const linkStyle = isMobile
+    ? { ...styles.link, padding: '0.35rem 0.5rem', fontSize: '0.78rem', whiteSpace: 'nowrap' }
+    : styles.link
+
   return (
     <header style={styles.header}>
-      <div style={styles.inner}>
+      <div style={innerStyle}>
         <button onClick={() => navigate('/')} style={styles.brand}>
           ⚡ Vibebug
         </button>
-        <nav style={styles.nav}>
+        <nav style={navStyle}>
           {NAV_LINKS.map(({ label, path }) => {
             const active = location.pathname === path
             return (
               <button
                 key={path}
                 onClick={() => navigate(path)}
-                style={{ ...styles.link, ...(active ? styles.linkActive : {}) }}
+                style={{ ...linkStyle, ...(active ? styles.linkActive : {}) }}
               >
                 {label}
                 {active && <span style={styles.dot} />}

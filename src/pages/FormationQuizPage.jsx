@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { formations, LEVELS } from '../data/formations'
+import { useWindowSize } from '../utils/useWindowSize'
 
 const POINTS_PER_QUESTION = 2 // 10 questions × 2 = /20
 
@@ -14,6 +15,8 @@ function getMention(score) {
 export default function FormationQuizPage() {
   const { id }   = useParams()
   const navigate = useNavigate()
+  const width    = useWindowSize()
+  const isMobile = width < 768
 
   const formation = formations.find(f => f.id === id)
 
@@ -129,7 +132,7 @@ export default function FormationQuizPage() {
       {/* Nav */}
       <div style={styles.nav}>
         <button onClick={() => navigate(`/formations/${id}`)} style={styles.btnNav}>
-          ← {formation.title}
+          {isMobile ? '←' : `← ${formation.title}`}
         </button>
         <span
           style={{
@@ -161,7 +164,7 @@ export default function FormationQuizPage() {
       </div>
 
       {/* Question */}
-      <h2 style={styles.questionTitle}>{question.question}</h2>
+      <h2 style={{ ...styles.questionTitle, fontSize: isMobile ? '1.05rem' : '1.15rem' }}>{question.question}</h2>
 
       {/* Options */}
       <div style={styles.options}>
@@ -170,7 +173,11 @@ export default function FormationQuizPage() {
             key={index}
             onClick={() => handleSelect(index)}
             disabled={isAnswered}
-            style={getOptionStyle(index)}
+            style={{
+              ...getOptionStyle(index),
+              fontSize: isMobile ? '0.95rem' : '0.925rem',
+              padding: isMobile ? '0.875rem 1rem' : '0.75rem 1rem',
+            }}
           >
             <span style={styles.optionLetter}>{String.fromCharCode(65 + index)}.</span>
             {option}
