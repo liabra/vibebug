@@ -120,6 +120,25 @@ export default function FormationDetailPage() {
         </div>
       </div>
 
+      {/* PDF Section */}
+      {formation.pdfUrl && (
+        <div style={styles.pdfSection}>
+          <div style={styles.pdfSectionHeader}>
+            <h2 style={styles.sectionTitle}>Fiche PDF</h2>
+            <a href={formation.pdfUrl} download style={styles.btnDownload}>
+              ⬇ Télécharger
+            </a>
+          </div>
+          <iframe
+            src={formation.pdfUrl}
+            width="100%"
+            height={isMobile ? '420px' : '540px'}
+            style={{ border: 'none', borderRadius: '8px', display: 'block' }}
+            title={`Fiche PDF — ${formation.title}`}
+          />
+        </div>
+      )}
+
       {/* Chapters */}
       <div ref={chaptersRef} style={styles.chaptersSection}>
         <h2 style={styles.sectionTitle}>Chapitres</h2>
@@ -313,6 +332,34 @@ const styles = {
     fontSize: '0.9rem',
     fontWeight: '600',
     cursor: 'pointer',
+    fontFamily: 'system-ui, sans-serif',
+  },
+
+  /* PDF */
+  pdfSection: {
+    marginBottom: '2rem',
+  },
+  pdfSectionHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: '0.875rem',
+    flexWrap: 'wrap',
+    gap: '0.5rem',
+  },
+  btnDownload: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '0.3rem',
+    padding: '0.45rem 1rem',
+    background: '#eff6ff',
+    color: '#2563eb',
+    border: '1px solid #bfdbfe',
+    borderRadius: '8px',
+    fontSize: '0.85rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    textDecoration: 'none',
     fontFamily: 'system-ui, sans-serif',
   },
 
