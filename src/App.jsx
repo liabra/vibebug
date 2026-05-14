@@ -4,6 +4,7 @@ import ModesPage from './pages/ModesPage'
 import ReconstructPage from './pages/ReconstructPage'
 import LevelsPage from './pages/LevelsPage'
 import AutoLevelsPage from './pages/AutoLevelsPage'
+import NetworkLevelsPage from './pages/NetworkLevelsPage'
 import SpeedDebugPage from './pages/SpeedDebugPage'
 import ChallengePage from './pages/ChallengePage'
 import ResultsPage from './pages/ResultsPage'
@@ -19,6 +20,7 @@ function App() {
         <Route path="/modes" element={<ModesPage />} />
         <Route path="/levels" element={<LevelsPage />} />
         <Route path="/auto-levels" element={<AutoLevelsPage />} />
+        <Route path="/network-levels" element={<NetworkLevelsPage />} />
         <Route path="/challenge/:levelId" element={<ChallengePage />} />
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/profile" element={<ProfilePage />} />

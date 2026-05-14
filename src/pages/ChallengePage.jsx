@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
 import { automationChallenges } from '../data/automationChallenges'
+import { networkChallenges } from '../data/networkChallenges'
 
-const ALL_CHALLENGES = { ...bashChallenges, ...automationChallenges }
+const ALL_CHALLENGES = { ...bashChallenges, ...automationChallenges, ...networkChallenges }
 
 const MISSIONS_PER_SESSION = 5
 

@@ -53,6 +53,16 @@ export const modules = [
     topics: ['Scripts Bash', 'Cron & tâches planifiées', 'CI/CD', 'Gestion d\'erreurs'],
   },
   {
+    id: 'reseau',
+    title: 'Réseau',
+    track: 'Avancé',
+    icon: '🌐',
+    desc: 'DNS, ports, connectivité — diagnostique les pannes réseau au lieu de relancer à l\'aveugle.',
+    status: 'active',
+    path: '/network-levels',
+    topics: ['DNS & résolution', 'Connectivité IP', 'Ports & services', 'Firewall', 'Outils de diagnostic'],
+  },
+  {
     id: 'cloud-deploy',
     title: 'Cloud / Déploiement',
     track: 'Avancé',
