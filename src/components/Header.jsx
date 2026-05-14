@@ -1,10 +1,11 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const NAV_LINKS = [
-  { label: 'Accueil', path: '/' },
-  { label: 'Modes',   path: '/modes' },
-  { label: 'Niveaux', path: '/levels' },
-  { label: 'Profil',  path: '/profile' },
+  { label: 'Accueil',     path: '/'           },
+  { label: 'Modes',       path: '/modes'      },
+  { label: 'Niveaux',     path: '/levels'     },
+  { label: 'Formations',  path: '/formations' },
+  { label: 'Profil',      path: '/profile'    },
 ]
 
 export default function Header() {

@@ -9,6 +9,9 @@ import SpeedDebugPage from './pages/SpeedDebugPage'
 import ChallengePage from './pages/ChallengePage'
 import ResultsPage from './pages/ResultsPage'
 import ProfilePage from './pages/ProfilePage'
+import FormationsPage from './pages/FormationsPage'
+import FormationDetailPage from './pages/FormationDetailPage'
+import FormationQuizPage from './pages/FormationQuizPage'
 import Header from './components/Header'
 
 function App() {
@@ -26,6 +29,9 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/speed" element={<SpeedDebugPage />} />
         <Route path="/reconstruct" element={<ReconstructPage />} />
+        <Route path="/formations" element={<FormationsPage />} />
+        <Route path="/formations/:id" element={<FormationDetailPage />} />
+        <Route path="/formations/:id/quiz" element={<FormationQuizPage />} />
       </Routes>
     </BrowserRouter>
   )
