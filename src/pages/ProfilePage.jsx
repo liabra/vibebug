@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { bashChallenges } from '../data/bashChallenges'
 import { getSaved, getLevelStatus, getBadge, getTotalXp, getCompletedCount, getGlobalStats, getUsername, setUsername } from '../utils/progressUtils'
 import { computeEarnedBadgeIds, badgesFromIds } from '../utils/badgeUtils'
+import { useWindowSize } from '../utils/useWindowSize'
 
 const STATUS_META = {
   locked:    { label: 'Verrouillé', color: '#9ca3af', bg: '#f3f4f6', border: '#d1d5db' },
@@ -14,10 +15,12 @@ const STATUS_META = {
 // --- component ---------------------------------------------------------------
 
 export default function ProfilePage() {
-  const navigate = useNavigate()
-  const levelEntries = Object.entries(bashChallenges)
+  const navigate      = useNavigate()
+  const width         = useWindowSize()
+  const isNarrow      = width < 480
+  const levelEntries  = Object.entries(bashChallenges)
   const [username, setUsernameState] = useState(getUsername)
-  const [inputValue, setInputValue] = useState(getUsername)
+  const [inputValue, setInputValue]  = useState(getUsername)
   const total = levelEntries.length
 
   const levels = levelEntries.map(([id, level], index) => {
@@ -87,7 +90,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Stats */}
-      <div style={styles.statsRow}>
+      <div style={{ ...styles.statsRow, gridTemplateColumns: isNarrow ? '1fr' : 'repeat(3, 1fr)' }}>
         <div style={styles.statBox}>
           <span style={styles.statValue}>⚡ {totalXp}</span>
           <span style={styles.statLabel}>XP total</span>
@@ -156,7 +159,7 @@ export default function ProfilePage() {
       {/* Statistiques */}
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>Statistiques</h2>
-        <div style={styles.statsGrid}>
+        <div style={{ ...styles.statsGrid, gridTemplateColumns: isNarrow ? '1fr' : 'repeat(2, 1fr)' }}>
           <div style={styles.statCell}>
             <span style={styles.statCellValue}>{stats.totalAnswered}</span>
             <span style={styles.statCellLabel}>Questions répondues</span>
